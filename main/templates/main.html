@@ -1,0 +1,45 @@
+<!DOCTYPE html> 
+<html lang="id"> 
+<head>
+    <meta charset="UTF-8"> <!-- Set karakter ke UTF8 biar huruf/emoji bisa tampil dengan benar -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Biar responsif di hp -->
+    <title>{{ app_name }} - Home</title> 
+    <style>  
+        body {
+            font-family: Arial, Helvetica, sans-serif; /* urutan font cadangan : kalau arial gaada, ganti ke helvetica */ 
+            background: radial-gradient(circle, #ffb6c1, #ffc1cc, #ffe4ec); 
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8);
+            padding: 2rem; /* Ruang dalam box */
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { /* Judul */
+            color: #166641;
+            margin-bottom: 1rem;
+        }
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .highlight { /* Text yang di bold/highlight */
+            font-weight: bold;
+            color: #000000;
+        }
+    </style>
+</head>
+<body> <!-- Isi yang terlihat -->
+    <div class="container"> <!-- Menampilkan kotak -->
+        <h1>{{ app_name }}</h1> <!-- Judul halaman yang ambil dari variable django app_name -->
+        <p>Nama: <span class="highlight">{{ student_name }}</span></p> <!-- Span untuk ngebold -->
+        <p>Kelas: <span class="highlight">{{ student_class }}</span></p>
+        <p>Welcome to <span class="highlight">{{ app_name }}</span> 💗 </p>
+        <p><span class="highlight">Stay tuned for updates!</span></p> 
+    </div>
+</body>
+</html>
