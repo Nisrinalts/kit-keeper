@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}KitKeeper{% endblock title %}</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: radial-gradient(circle, #ffb6c1, #ffc1cc, #ffe4ec);
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8);
+      padding: 1.5rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    a.button, button {
+      display: inline-block;
+      padding: .5rem .9rem;
+      border: 1px solid #333;
+      border-radius: 12px;
+      background: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      color: #333;
+      font-size: .9rem;
+    }
+    a.button:hover, button:hover {
+      background: #ffe4ec;
+    }
+    ul { padding-left: 1.2rem; }
+    .muted { color: #666; font-size: .9rem; }
+    h1 {
+    color: #0c0d0c; 
+  }
+  </style>
+  {% block meta %}{% endblock meta %}
+</head>
+<body>
+  <div class="container">
+    {% block content %}{% endblock content %}
+  </div>
+</body>
+</html>

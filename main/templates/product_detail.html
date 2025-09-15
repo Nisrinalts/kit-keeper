@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} — KitKeeper{% endblock %}
+
+{% block meta %}
+<style>
+  .container { background: radial-gradient(circle, #fff7cc, #fff0b3, #ffeaa7) !important; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+
+  .photo-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    padding: 12px;
+  }
+  .photo-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+  }
+  .kv { margin: .4rem 0; }
+  .kv b { display:inline-block; min-width: 130px; }
+</style>
+{% endblock %}
+
+{% block content %}
+  <a class="button" href="{% url 'main:show_main' %}">← Back</a>
+
+  <div class="detail-grid" style="margin-top:1rem;">
+    <div>
+      <h2 style="margin:.25rem 0 1rem 0;">{{ product.name }}</h2>
+
+      <p class="kv"><b>Price:</b> Rp{{ product.price }}</p>
+      <p class="kv"><b>Category:</b> {{ product.get_category_display }}</p>
+      <p class="kv"><b>Description:</b> {{ product.description }}</p>
+
+      <p class="kv"><b>Size:</b> {{ product.get_size_display|default:"-" }}</p>
+      <p class="kv"><b>Sleeve:</b> {{ product.get_sleeve_type_display|default:"-" }}</p>
+
+      <p class="kv"><b>Team:</b> {{ product.team|default:"-" }}</p>
+      <p class="kv"><b>Season:</b> {{ product.season|default:"-" }}</p>
+      <p class="kv"><b>Condition:</b> {{ product.condition|default:"-" }}</p>
+      <p class="kv"><b>Manufacturer:</b> {{ product.manufacturer|default:"-" }}</p>
+      <p class="kv"><b>Stock:</b> {{ product.stock }}</p>
+    </div>
+
+    <div>
+      {% if product.thumbnail %}
+        <div class="photo-card">
+          <img src="{{ product.thumbnail }}" alt="{{ product.name }}">
+        </div>
+      {% else %}
+        <div class="photo-card" style="text-align:center; padding:40px;">
+          <em>No image</em>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

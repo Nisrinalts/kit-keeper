@@ -1,45 +1,154 @@
-<!DOCTYPE html> 
-<html lang="id"> 
-<head>
-    <meta charset="UTF-8"> <!-- Set karakter ke UTF8 biar huruf/emoji bisa tampil dengan benar -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Biar responsif di hp -->
-    <title>{{ app_name }} - Home</title> 
-    <style>  
-        body {
-            font-family: Arial, Helvetica, sans-serif; /* urutan font cadangan : kalau arial gaada, ganti ke helvetica */ 
-            background: radial-gradient(circle, #ffb6c1, #ffc1cc, #ffe4ec); 
-            margin: 0;
-            padding: 2rem;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8);
-            padding: 2rem; /* Ruang dalam box */
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        h1 { /* Judul */
-            color: #166641;
-            margin-bottom: 1rem;
-        }
-        p {
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        .highlight { /* Text yang di bold/highlight */
-            font-weight: bold;
-            color: #000000;
-        }
-    </style>
-</head>
-<body> <!-- Isi yang terlihat -->
-    <div class="container"> <!-- Menampilkan kotak -->
-        <h1>{{ app_name }}</h1> <!-- Judul halaman yang ambil dari variable django app_name -->
-        <p>Nama: <span class="highlight">{{ student_name }}</span></p> <!-- Span untuk ngebold -->
-        <p>Kelas: <span class="highlight">{{ student_class }}</span></p>
-        <p>Welcome to <span class="highlight">{{ app_name }}</span> 💗 </p>
-        <p><span class="highlight">Stay tuned for updates!</span></p> 
-    </div>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Product List — KitKeeper{% endblock title %}
+
+{% block meta %}
+<style>
+  .cards{ display:grid; gap:12px; }
+  /* Kotak kecil */
+  .card{
+    position:relative;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,.14);
+    box-shadow:0 6px 16px rgba(0,0,0,.06);
+    padding:8px;
+  }
+  /* warna pastel berulang */
+  .cards > div:nth-child(4n+1) .card{ background:#cae5f7; }
+  .cards > div:nth-child(4n+2) .card{ background:#fad1ba; }
+  .cards > div:nth-child(4n+3) .card{ background:#fff7cc; }
+  .cards > div:nth-child(4n+4) .card:hover{ background:#befacb; }
+
+  :root{
+    --photo-w: 140px;     /* lebar kolom foto */
+    --row-h: 110px;       /* tinggi kartu & foto */
+  }
+
+  /* Dua kolom utama: kiri foto, kanan teks */
+  .card-inner{
+    display:grid;
+    grid-template-columns: var(--photo-w) 1fr;
+    gap:8px;
+    align-items:stretch;          /* kiri & kanan sama tinggi */
+    min-height: var(--row-h);
+  }
+
+  /* Frame foto (kiri) */
+  .frame-left{
+    border:1.5px solid rgba(0,0,0,.20);
+    border-radius:12px;
+    overflow:hidden;
+    background:#f6f6f6;
+    height: var(--row-h);         /* ini yang bikin seragam tingginya */
+  }
+  .frame-left img{
+    width:100%;
+    height:100%;
+    object-fit:cover;             /* crop rapih */
+    display:block;
+  }
+
+  /* Frame teks (kanan) */
+  .frame-right{
+    border:1.5px solid rgba(0,0,0,.20);
+    border-radius:12px;
+    padding:8px 10px;            
+    display:grid;
+    grid-template-rows: auto auto;/* atas & bawah dipisah garis */
+    row-gap:6px;                 
+  }
+
+  /* Bagian atas: Product + Nama (align kiri) */
+  .right-top{
+    display:flex; flex-direction:column; align-items:flex-start;
+    gap:4px;
+  }
+  .label{
+    display:inline-block;
+    font-size:.7rem; letter-spacing:.06em; text-transform:uppercase;
+    background:#fff; border:1px solid rgba(0,0,0,.12);
+    padding:.16rem .5rem; border-radius:999px;
+  }
+  .title{
+    margin:0;
+    font-size:1.2rem;            
+    line-height:1.1;
+  }
+
+  /* Garis pemisah horizontal */
+  .divider{
+    width:100%; height:1px;
+    background: rgba(0,0,0,.18);
+    margin:2px 0;
+  }
+
+  /* Bawah: kiri info, kanan tombol */
+  .right-bottom{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    align-items:center;
+    column-gap:8px;
+  }
+  .sub{ margin:0; color:#222; font-size:.9rem; }
+  .btn-detail{ padding:.32rem .7rem; font-size:.85rem; }
+
+  @media (max-width: 900px){
+    :root{ --photo-w: 120px; --row-h: 100px; }
+  }
+</style>
+{% endblock meta %}
+
+{% block content %}
+<header>
+  <div>
+    <h1>{{ app_name }}</h1>
+    <p class="muted">Nama: {{ student_name }} | Kelas: {{ student_class }}</p>
+  </div>
+  <a class="button" href="{% url 'main:create_product' %}">+ Add Product</a>
+</header>
+
+{% if products %}
+  <div class="cards">
+    {% for p in products %}
+      <div>
+        <div class="card">
+          <div class="card-inner">
+            <!-- KIRI: Frame foto -->
+            <div class="frame-left">
+              {% if p.thumbnail %}
+                <img src="{{ p.thumbnail }}" alt="{{ p.name }}">
+              {% else %}
+                <div style="height:100%;display:flex;align-items:center;justify-content:center;color:#888;">
+                  No Image
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- KANAN: Frame teks -->
+            <div class="frame-right">
+              <!-- Atas: Product + Nama (align kiri) -->
+              <div class="right-top">
+                <span class="label">Product {{ forloop.counter }}</span>
+                <h3 class="title">{{ p.name }}</h3>
+              </div>
+
+              <!-- Garis pemisah -->
+              <div class="divider"></div>
+
+              <!-- Bawah: kiri info, kanan tombol -->
+              <div class="right-bottom">
+                <p class="sub">
+                  {% if p.category %}{{ p.get_category_display|default:p.category }}{% endif %}
+                  {% if p.team %} — {{ p.team }}{% endif %}
+                </p>
+                <a class="button btn-detail" href="{% url 'main:show_product' p.id %}">Detail</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>Belum ada produk.</p>
+{% endif %}
+{% endblock content %}

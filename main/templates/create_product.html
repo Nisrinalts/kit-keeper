@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Add Product — KitKeeper{% endblock %}
+
+{% block meta %}
+<style>
+  .container {
+    background: radial-gradient(circle, #fff7cc, #fff0b3, #ffeaa7) !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <a class="button" href="{% url 'main:show_main' %}">← Back</a>
+  <h2 style="margin-top:1rem;">Add Product</h2>
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

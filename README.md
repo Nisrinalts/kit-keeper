@@ -37,3 +37,19 @@ Menurut aku, Django cocok banget dijadikan “framework pertama” karena dia me
 
 6. Apakah ada feedback untuk asisten dosen tutorial 1 yang telah aku kerjakan sebelumnya? 
 Hmm tidak ada kak yay makasih ya keep it up hehe
+
+TUGAS 3
+1. Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
+Data delivery itu penting banget karena dia jembatan antara backend (server, database, logika) dengan frontend (tampilan, interaksi user). Tanpa data delivery yang baik, aplikasi web bakal statis, gak interaktif, dan gak bisa ngasih pengalaman personal ke user. Dengan data delivery, backend bisa ngirim data dinamis (misalnya daftar produk, profil user, hasil pencarian) ke frontend secara real-time atau sesuai kebutuhan. Ini bikin aplikasi terasa hidup, responsif, dan relevan buat user. Selain itu, data delivery juga memungkinkan sinkronisasi data antar user (misalnya notifikasi chat), integrasi dengan layanan eksternal (misalnya pembayaran online), dan optimasi performa (misalnya lazy loading). Singkatnya, data delivery itu fondasi buat bikin aplikasi web modern yang engaging, fungsional, dan scalable.
+2. Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+Menurut aku, keduanya sama-sama baik. Tergantung dengan kebutuhan kita saja. 
+JSON (lebih populer karena):
+    - Lebih ringkas & human-readable (kurang boilerplate dibanding XML).
+    - Pemetaan tipe data langsung ke struktur bahasa pemrograman (objek, list, number, bool).
+    - Native di JavaScript → parsing cepat (JSON.parse) dan dukungan luas di browser/API modern.
+    - Payload biasanya lebih kecil → lebih hemat bandwidth.
+XML cocok kalau:
+    - Dokumen butuh markup kaya (atribut, mixed content) atau transformasi dengan XSLT/XPath.
+    - Validasi ketat dengan XSD/DTD & namespaces yang kompleks.
+Tapi, untuk API modern, JSON umumnya pilihan default; untuk dokumen/format legacy & transformasi dokumen, XML masih relevan.
+3. 
