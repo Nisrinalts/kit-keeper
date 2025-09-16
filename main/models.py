@@ -51,7 +51,7 @@ class Product(models.Model):
     )
     condition = models.CharField(max_length=50, blank=True)    
     manufacturer = models.CharField(max_length=50, blank=True) 
-    stock = models.PositiveIntegerField(default=0)         
+    stock = models.IntegerField(default=0)         
     created_at = models.DateTimeField(auto_now_add=True)   
 
     def __str__(self):
