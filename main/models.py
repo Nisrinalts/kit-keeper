@@ -22,7 +22,7 @@ SLEEVE_CHOICES = [
 ]
 
 class Product(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100) 
     price = models.IntegerField()                          
     description = models.TextField()                       
@@ -53,9 +53,7 @@ class Product(models.Model):
     manufacturer = models.CharField(max_length=50, blank=True) 
     stock = models.IntegerField(default=0)         
     created_at = models.DateTimeField(auto_now_add=True)
-    
 
     def __str__(self):
         return self.name
 
-#tes

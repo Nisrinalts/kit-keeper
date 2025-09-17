@@ -7,4 +7,7 @@ class ProductForm(ModelForm):
         fields = [
             "name", "price", "description", "thumbnail", "category", "is_featured",
             "team", "season", "size", "sleeve_type", "condition", "manufacturer", "stock",
-        ]   
+        ]
+        labels = {
+            "sleeve_type": "Sleeve",
+        }
