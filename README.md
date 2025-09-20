@@ -86,3 +86,14 @@ Best practice:
     Halaman detail dihasilkan oleh show_product yang memanggil get_object_or_404(Product, pk=id) sehingga jika UUID tidak valid atau data tidak ada, pengguna akan mendapat 404 yang tepat. Template templates/product_detail.html menata informasi dalam dua kolom: bagian kiri berisi teks (nama produk, harga, kategori, ukuran, jenis sleeve, dan atribut relevan lainnya), sementara bagian kanan menyajikan foto di dalam photo card terpisah. Untuk menampilkan label yang ramah pengguna pada field bertipe choices, aku menggunakan helper {{ product.get_<field>_display }} sehingga, misalnya, “short” ditampilkan sebagai “Short Sleeve”. Khusus halaman detail, gaya container aku override menjadi putih agar isi lebih fokus, sementara halaman daftar tetap memakai latar gradient sesuai tema
 
 LINK DRIVE FOTO : https://drive.google.com/drive/folders/1QkHMYRa5oEKPHRdwSnfnErx-qviH7hZr?usp=sharing 
+
+TUGAS 4
+1. Apa itu Django AuthenticationForm? Jelaskan juga kelebihan dan kekurangannya
+
+2. Apa perbedaan antara autentikasi dan otorisasi? Bagaiamana Django mengimplementasikan kedua konsep tersebut?
+
+3. Apa saja kelebihan dan kekurangan session dan cookies dalam konteks menyimpan state di aplikasi web?
+
+4. Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+
+5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).

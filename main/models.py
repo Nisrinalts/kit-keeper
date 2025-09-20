@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.contrib.auth.models import User
 
 CATEGORY_CHOICES = [
     ("jersey", "Jersey"),
@@ -53,6 +54,7 @@ class Product(models.Model):
     manufacturer = models.CharField(max_length=50, blank=True) 
     stock = models.IntegerField(default=0)         
     created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
