@@ -16,7 +16,7 @@ from django.shortcuts import render, redirect
 
 @login_required(login_url='/login')
 def show_main(request):
-    filter_type = request.GET.get("filter", "all")  # 'all' | 'my'
+    filter_type = request.GET.get("filter", "all")  
     if filter_type == "my":
         products = Product.objects.filter(user=request.user)
     else:
