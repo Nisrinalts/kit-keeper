@@ -89,11 +89,48 @@ LINK DRIVE FOTO : https://drive.google.com/drive/folders/1QkHMYRa5oEKPHRdwSnfnEr
 
 TUGAS 4
 1. Apa itu Django AuthenticationForm? Jelaskan juga kelebihan dan kekurangannya
+    Django AuthenticationForm adalah form bawaan dari django.contrib.auth.forms untuk login yang menyediakan fields username dan password memvalidasi lewat aut backend dan apabila valid akan mengembalikan user yang bisa dipakai login(request, user)
+    Kelebihannya yaitu siap pakai dan aman, terintegrasi session dan juga pesan error yang standard cocok untuk pemula. Kekurangannya yaitu keterbatasan yang hanya menyediakan username/password sehingga kalau butuh fields tambahan akan memerlukan custom form dan juga pesan error yang generik.
 
 2. Apa perbedaan antara autentikasi dan otorisasi? Bagaiamana Django mengimplementasikan kedua konsep tersebut?
+    Autentikasi : verifikasi siapa kita(login). Di Django: authenticate() -> jika OK, login() menyimpan identitas ke session
+    Otorisasi : verifikasi boleh akses apa. Di Django: pengecekan user.is_authenticated, @login_required, permission & groups (permission_required, user.has_perm()), serta pola kontrol akses lain
 
 3. Apa saja kelebihan dan kekurangan session dan cookies dalam konteks menyimpan state di aplikasi web?
+    Session
+        Kelebihan : data sensitif disimpan di server, cookie di klien hanya menyimpan sessionid, bisa dicabut sisi server. Sehingga cocok untuk info user/login
+        Kekurangan : ada beban penyimpanan di server, perlu skalabilitas (DB/cache) saat traffic besar
+    Cookies
+        Kelebihan : ringan, sederhana, bisa persisten(tetap ada setelah browser ditutup) sehingga cocok untuk preferensi ringan
+        Kekurangan : kapasitas kecil, bisa dibaca/diutak atik klien, rawan dicuri lewat XSS, dan mudah “terlihat” di request sehingga jangan taruh data sensitif
 
 4. Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+    Tidak otomatis aman. Risiko umum: XSS (mencuri cookie), CSRF (menyalahgunakan session pengguna), sniffing saat non-HTTPS, dan salah konfigurasi.
+    Django membantu :
+        - CSRF protection aktif default (CsrfViewMiddleware) + {% csrf_token %} di form.
+        - Escaping template bantu cegah XSS (tapi tetap harus sanitasi input)
+        - Session cookie biasanya diberi HttpOnly (mengurangi akses JS) & SameSite (mitigasi CSRF) -> gunakan Secure pada HTTPS lewat SESSION_COOKIE_SECURE/CSRF_COOKIE_SECURE
+    Sehingga, pakai cookie untuk hal ringan. Untuk autentikasi/identitas, simpan di session server-side dan pastikan flag keamanan diaktifkan
 
 5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+    - Mengimplementasikan fungsi registrasi, login, dan logout untuk memungkinkan pengguna mengakses aplikasi sebelumnya sesuai dengan status login/logoutnya : Routing & view, Aku tambah tiga route di main/urls.py: /register/, /login/, dan /logout/.
+    Di views.py: register(request): pakai UserCreationForm. Kalau valid -> form.save() -> tampilkan pesan sukses -> redirect ke /login/ (sengaja tidak auto-login supaya metrik last_login dicatat saat login beneran)
+    login_user(request): pakai AuthenticationForm. Kalau valid -> login(request, user) -> bikin HttpResponseRedirect ke halaman utama -> set cookie last_login dengan timestamp sekarang -> return response.
+    logout_user(request): panggil logout(request) -> hapus cookie last_login -> redirect ke /login/.
+    Template, Aku buat login.html dan register.html yang simple, sudah ada {% csrf_token %} dan tanpa pemanggilan method ber argumen di template
+    - Membuat dua (2) akun pengguna dengan masing-masing tiga (3) dummy data menggunakan model yang telah dibuat sebelumnya untuk setiap akun di lokal : Sesuai permintaan soal, aku membuat 2 akun langsung dari website PWS lewat halaman Register. Lalu login masing-masing akun dan menambahkan 3 produk per akun via tombol Add Product. Ini sekaligus menguji end-to-end flow: register -> login (cookie terset) -> create product (terkait user).
+    - Menghubungkan model Product dengan User : 
+    Di main/models.py aku tambahkan field: user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    Lalu makemigrations + migrate.
+    Di create_product, aku simpan pemilik produk:
+    product = form.save(commit=False)
+    product.user = request.user
+    product.save()
+    Aku juga punya filter “All / My Products” di show_main untuk memfilter berdasarkan request.user.
+    Ini menerapkan relasi many-to-one (banyak product ke satu user).
+    - Menampilkan detail informasi pengguna yang sedang logged in seperti username dan menerapkan cookies seperti last_login pada halaman utama aplikasi : Di show_main(request) aku kirimkan ke context:
+    "name": request.user.username,
+    "last_login": request.COOKIES.get("last_login", "Never")
+    Di main.html aku tampilkan bar kecil di bawah header:
+    Welcome, {{ request.user.username }} • Last login: {{ last_login }}
+    Semua view yang harus aman—show_main, create_product, show_product—aku beri @login_required agar non-logged user otomatis diarahkan ke /login
