@@ -16,11 +16,11 @@ from django.shortcuts import render, redirect
 
 @login_required(login_url='/login')
 def show_main(request):
-    filter_type = request.GET.get("filter", "my")  
-    if filter_type == "all":
-        products = Product.objects.all()
-    else:
+    filter_type = request.GET.get("filter", "all")  
+    if filter_type == "my":
         products = Product.objects.filter(user=request.user)
+    else:
+        products = Product.objects.all()
 
     context = {
         "npm": "2406354000",
