@@ -2,10 +2,10 @@
 {% block title %}Register — KitKeeper{% endblock %}
 
 {% block content %}
-<div class="min-h-[calc(100dvh-4rem)] grid place-items-center p-4">
-  <div class="w-[min(460px,92vw)] rounded-[18px] p-[22px_20px] bg-gradient-card border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
+<div class="min-h-[calc(100dvh-4rem)] grid place-items-center px-3 sm:px-4">
+  <div class="w-full max-w-[480px] rounded-[18px] p-5 sm:p-6 bg-gradient-card border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
     <div class="mb-3">
-      <h1 class="m-0 text-[1.35rem] tracking-[0.2px] font-bold">Create your account</h1>
+      <h1 class="m-0 text-2xl sm:text-[1.35rem] tracking-[0.2px] font-bold">Create your account</h1>
       <p class="mt-0.5 mb-0 text-textGray text-[0.92rem]">It takes less than a minute</p>
     </div>
 
@@ -19,36 +19,49 @@
       <!-- Username -->
       <div class="my-3">
         <label for="{{ form.username.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Username</label>
-        <input type="text" name="username" id="{{ form.username.id_for_label }}" 
-               class="block w-full rounded-xl border border-black/[0.14] bg-white py-3 px-3.5 text-[0.96rem]">
+        <input
+          type="text"
+          name="username"
+          id="{{ form.username.id_for_label }}"
+          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
+          autocapitalize="none" spellcheck="false">
         {{ form.username.errors }}
         {% if form.username.help_text %}
-          <div class="mt-1.5 text-[#6b7280] text-[0.85rem]">{{ form.username.help_text|safe }}</div>
+          <div class="mt-1.5 text-[#6b7280] text-[0.85rem] leading-snug">{{ form.username.help_text|safe }}</div>
         {% endif %}
       </div>
 
       <!-- Password -->
       <div class="my-3">
         <label for="{{ form.password1.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Password</label>
-        <input type="password" name="password1" id="{{ form.password1.id_for_label }}"
-               class="block w-full rounded-xl border border-black/[0.14] bg-white py-3 px-3.5 text-[0.96rem]">
+        <input
+          type="password"
+          name="password1"
+          id="{{ form.password1.id_for_label }}"
+          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent">
         {{ form.password1.errors }}
         {% if form.password1.help_text %}
-          <div class="mt-1.5 text-[#6b7280] text-[0.85rem]">{{ form.password1.help_text|safe }}</div>
+          <div class="mt-1.5 text-[#6b7280] text-[0.85rem] leading-snug">{{ form.password1.help_text|safe }}</div>
         {% endif %}
       </div>
 
       <!-- Confirm Password -->
       <div class="my-3">
         <label for="{{ form.password2.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Confirm Password</label>
-        <input type="password" name="password2" id="{{ form.password2.id_for_label }}"
-               class="block w-full rounded-xl border border-black/[0.14] bg-white py-3 px-3.5 text-[0.96rem]">
+        <input
+          type="password"
+          name="password2"
+          id="{{ form.password2.id_for_label }}"
+          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent">
         {{ form.password2.errors }}
       </div>
 
       <button type="submit"
-        class="w-full mt-3.5 py-3 px-4 font-semibold tracking-[0.2px] bg-white text-[#111827] rounded-[14px] border border-[#111827]
-              hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
+        class="w-full mt-3.5 py-3 px-4 font-semibold tracking-[0.2px] bg-white text-[#111827] rounded-[14px]
+               border border-[#111827] hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
         Sign Up
       </button>
     </form>
@@ -59,7 +72,8 @@
       </ul>
     {% endif %}
 
-    <p class="mt-3 text-[0.92rem] text-textGray">Already have an account?
+    <p class="mt-3 text-[0.92rem] text-textGray">
+      Already have an account?
       <a class="text-linkText no-underline hover:underline font-bold" href="{% url 'main:login' %}">Sign In</a>
     </p>
   </div>

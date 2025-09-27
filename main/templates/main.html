@@ -26,70 +26,71 @@
 {% endblock meta %}
 
 {% block content %}
-<!-- Add pink gradient to page background -->
-<div class="min-h-[calc(100dvh-4rem)] p-4 bg-gradient-radial">
-  <!-- Add green gradient to container -->
-  <div class="max-w-[1200px] mx-auto rounded-[18px] p-6 bg-gradient-card border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
-    <header class="grid gap-3 md:grid-cols-[1fr_auto] items-start mb-4">
-      <!-- KIRI: filter + welcome (hanya di All) -->
+<!-- BG pink -->
+<div class="min-h-[calc(100dvh-4rem)] px-3 sm:px-4 py-4 bg-gradient-radial">
+  <!-- container hijau -->
+  <div class="max-w-screen-xl mx-auto rounded-[18px] p-4 sm:p-6 bg-gradient-card border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
+    <header class="grid gap-2 sm:gap-3 md:grid-cols-[1fr_auto] items-start mb-4">
+      <!-- KIRI: tab + welcome (hanya di All) -->
       <div>
         <div class="flex items-center gap-2">
           <a href="{% url 'main:show_main' %}?tab=all"
-             class="px-3 py-2 rounded-[12px] border text-[0.95rem] transition
+             class="px-3 py-2 rounded-[12px] border text-sm sm:text-[0.95rem] transition
                     {% if active_tab == 'all' %}
                       bg-[#fff7cc] border-[#f5df95] text-[#111827] font-semibold
                     {% else %}
                       bg-white border-[#e5e7eb] text-[#111827]
                       hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1]
-                    {% endif %}">
+                    {% endif %}"
+             aria-current="{% if active_tab == 'all' %}page{% else %}false{% endif %}">
             All Products
           </a>
-    
+
           <a href="{% url 'main:show_main' %}?tab=mine"
-             class="px-3 py-2 rounded-[12px] border text-[0.95rem] transition
+             class="px-3 py-2 rounded-[12px] border text-sm sm:text-[0.95rem] transition
                     {% if active_tab == 'mine' %}
                       bg-[#fff7cc] border-[#f5df95] text-[#111827] font-semibold
                     {% else %}
                       bg-white border-[#e5e7eb] text-[#111827]
                       hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1]
-                    {% endif %}">
+                    {% endif %}"
+             aria-current="{% if active_tab == 'mine' %}page{% else %}false{% endif %}">
             My Products
           </a>
         </div>
-    
+
         {% if active_tab == 'all' %}
-          <p class="mt-1 text-[0.95rem] text-[#374151]">
+          <p class="mt-1 text-sm sm:text-[0.95rem] text-[#374151]">
             Welcome, <strong>{{ request.user.username }}</strong>
           </p>
         {% endif %}
       </div>
-    
+
       <!-- KANAN: last login -->
-      <div class="text-[0.95rem] text-[#6b7280] md:text-right">
+      <div class="text-xs sm:text-[0.95rem] text-[#6b7280] md:text-right">
         Last login: {{ last_login }}
       </div>
     </header>
 
     {% if products %}
-      <div class="grid gap-3">
+      <div class="grid gap-3 sm:gap-4">
         {% for p in products %}
           {% cycle 'bg-[#cae5f7]' 'bg-[#fad1ba]' 'bg-[#fff7cc]' 'bg-[#befacb]' as cardbg silent %}
           {% include 'card_product.html' with product=p counter=forloop.counter cardbg=cardbg %}
-      {% endfor %}
+        {% endfor %}
       </div>
-      {% else %}
-      <div class="flex flex-col items-center justify-center py-16 text-center">
-        {# Letakkan gambar di static/img/empty-products.png #}
+    {% else %}
+      <div class="flex flex-col items-center justify-center py-12 sm:py-16 text-center">
         <img src="{% static 'img/empty-products.png' %}" alt="No products"
-          class="w-36 h-36 object-cover rounded-xl shadow-md" />
+             class="w-28 h-28 sm:w-36 sm:h-36 object-cover rounded-xl shadow-md" />
         {% if active_tab == 'mine' %}
-          <h3 class="mt-4 text-xl font-semibold text-[#111827]">No products in your collection</h3>
-          <p class="text-[#6b7280]">Start by adding your first product.</p>
+          <h3 class="mt-4 text-lg sm:text-xl font-semibold text-[#111827]">No products in your collection</h3>
+          <p class="text-[#6b7280] text-sm sm:text-base">Start by adding your first product.</p>
         {% else %}
-          <h3 class="mt-4 text-xl font-semibold text-[#111827]">No products found</h3>
-          <p class="text-[#6b7280]">Be the first to add a product to KitKeeper.</p>
+          <h3 class="mt-4 text-lg sm:text-xl font-semibold text-[#111827]">No products found</h3>
+          <p class="text-[#6b7280] text-sm sm:text-base">Be the first to add a product to KitKeeper.</p>
         {% endif %}
-    
+
         <a href="{% url 'main:create_product' %}"
            class="mt-3 inline-block px-4 py-2 bg-white text-primary border border-primary rounded-xl
                   hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
@@ -97,7 +98,6 @@
         </a>
       </div>
     {% endif %}
-    
   </div>
 </div>
 {% endblock content %}

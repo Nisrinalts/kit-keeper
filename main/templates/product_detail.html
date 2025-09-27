@@ -3,48 +3,49 @@
 {% block title %}{{ product.name }} — KitKeeper{% endblock %}
 
 {% block content %}
-<!-- FULL-BLEED PINK BG (sama seperti create_product) -->
+<!-- FULL-BLEED PINK BG -->
 <div class="fixed inset-0 -z-10 bg-[radial-gradient(circle,_#ffb6c1,_#ffc1cc,_#ffe4ec)]"></div>
 
 <div class="min-h-screen flex items-start md:items-center">
-  <div class="w-full max-w-[980px] mx-auto p-4">
+  <div class="w-full max-w-[980px] mx-auto px-3 sm:p-4">
     <!-- Kartu kuning -->
-    <div class="rounded-[20px] p-6 md:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.12)]
+    <div class="rounded-[20px] p-5 sm:p-6 md:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.12)]
                 bg-[radial-gradient(circle,_#fff7cc,_#fff0b3,_#ffeaa7)]">
 
       <!-- Back -->
       <a href="{% url 'main:show_main' %}"
-         class="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-[12px]
+         class="inline-flex items-center gap-2 mb-4 md:mb-6 px-4 py-2 rounded-[12px]
                 bg-white border border-[#111827]/20 text-[#111827]
                 hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
         ← Back
       </a>
 
-      <div class="grid gap-8 md:grid-cols-[1fr_auto]">
+      <div class="grid gap-6 md:gap-8 md:grid-cols-[1fr_auto]">
         <!-- LEFT: Detail -->
         <div>
-          <h1 class="text-[28px] leading-[34px] font-extrabold text-[#111827] mb-4">
+          <h1 class="text-2xl md:text-[28px] md:leading-[34px] font-extrabold text-[#111827] mb-3 md:mb-4">
             {{ product.name }}
           </h1>
 
-          <div class="space-y-2 text-[#111827]">
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Price:</span><span>Rp{{ product.price }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Category:</span><span>{{ product.get_category_display|default:product.category }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Description:</span><span>{{ product.description }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Size:</span><span>{{ product.get_size_display|default:"-" }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Sleeve:</span><span>{{ product.get_sleeve_type_display|default:"-" }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Team:</span><span>{{ product.team|default:"-" }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Season:</span><span>{{ product.season|default:"-" }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Condition:</span><span>{{ product.condition|default:"-" }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Manufacturer:</span><span>{{ product.manufacturer|default:"-" }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Stock:</span><span>{{ product.stock|default:"0" }}</span></p>
-            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Owner:</span><span>{{ product.user|default:"None" }}</span></p>
+          <!-- grid label: value (lebih rapi di mobile) -->
+          <div class="grid grid-cols-[110px_1fr] gap-x-3 gap-y-2 text-[#111827] text-sm sm:text-base">
+            <span class="font-bold">Price:</span>         <span>Rp{{ product.price }}</span>
+            <span class="font-bold">Category:</span>      <span>{{ product.get_category_display|default:product.category }}</span>
+            <span class="font-bold">Description:</span>   <span>{{ product.description }}</span>
+            <span class="font-bold">Size:</span>          <span>{{ product.get_size_display|default:"-" }}</span>
+            <span class="font-bold">Sleeve:</span>        <span>{{ product.get_sleeve_type_display|default:"-" }}</span>
+            <span class="font-bold">Team:</span>          <span>{{ product.team|default:"-" }}</span>
+            <span class="font-bold">Season:</span>        <span>{{ product.season|default:"-" }}</span>
+            <span class="font-bold">Condition:</span>     <span>{{ product.condition|default:"-" }}</span>
+            <span class="font-bold">Manufacturer:</span>  <span>{{ product.manufacturer|default:"-" }}</span>
+            <span class="font-bold">Stock:</span>         <span>{{ product.stock|default:"0" }}</span>
+            <span class="font-bold">Owner:</span>         <span>{{ product.user|default:"None" }}</span>
           </div>
         </div>
 
-        <!-- RIGHT: Foto (padding sama di semua sisi) -->
-        <div class="justify-self-start">
-          <div class="w-[340px] rounded-[16px] bg-white border border-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.12)] p-4">
+        <!-- RIGHT: Foto (padding sama semua sisi, responsif) -->
+        <div class="justify-self-center md:justify-self-start">
+          <div class="w-full max-w-[340px] rounded-[16px] bg-white border border-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.12)] p-4">
             <div class="w-full rounded-[12px] overflow-hidden bg-[#e5e7eb] aspect-square">
               {% if product.thumbnail %}
                 <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-full object-cover block">
@@ -57,21 +58,24 @@
           </div>
         </div>
       </div>
-      <div class="mt-6 flex justify-end gap-2">
+
+      <!-- Actions -->
+      <div class="mt-5 md:mt-6 flex flex-col sm:flex-row sm:justify-end gap-2">
         <a href="{% url 'main:edit_product' product.id %}"
-           class="px-4 py-2 rounded-[12px] bg-white border border-[#111827] text-[#111827] font-medium
+           class="inline-flex items-center justify-center px-4 py-2 rounded-[12px] bg-white border border-[#111827] text-[#111827] font-medium
                   hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
           Edit
         </a>
         <form method="post" action="{% url 'main:delete_product' product.id %}">
           {% csrf_token %}
           <button type="submit"
-                  class="px-4 py-2 rounded-[12px] bg-white border border-[#b91c1c] text-[#b91c1c] font-medium
+                  class="inline-flex items-center justify-center px-4 py-2 rounded-[12px] bg-white border border-[#b91c1c] text-[#b91c1c] font-medium
                          hover:bg-[#b91c1c] hover:text-white transition">
             Delete
           </button>
         </form>
       </div>
+
     </div>
   </div>
 </div>
