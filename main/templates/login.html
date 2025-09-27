@@ -2,105 +2,70 @@
 {% block title %}Login — KitKeeper{% endblock %}
 
 {% block meta %}
-<style>
-  :root{ --card-w: 420px; --radius: 18px; }
-
-  /* kill inherited panel (green box) JUST on this page */
-  main, .container, .content, .panel, .page, .shell {
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        backgroundImage: {
+          'gradient-radial': 'radial-gradient(circle, #ffb6c1, #ffc1cc, #ffe4ec)',
+          'gradient-card': 'linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8)',
+        },
+        width: {
+          'card': '420px'
+        }
+      }
+    }
   }
-
-  .auth-wrap{
-    min-height: calc(100dvh - 4rem);
-    display:grid; place-items:center; padding:16px;
-  }
-
-  .card{
-    width:min(var(--card-w), 92vw);
-    border-radius: var(--radius);
-    padding:22px 20px;
-    background: linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8);
-    border:1px solid rgba(0,0,0,.10);
-    box-shadow:0 14px 32px rgba(0,0,0,.14);
-  }
-
-  .head{ margin-bottom:12px; }
-  .title{ margin:0; font-size:1.35rem; letter-spacing:.2px }
-  .sub{ margin:2px 0 0; color:#4b5563; font-size:.92rem }
-
-  .form-row{ margin:12px 0 6px; }
-  .form-row label{ display:block; font-size:.85rem; color:#263238; margin-bottom:6px; }
-
-  input[type="text"], input[type="password"]{
-    display:block; width:100%; max-width:100%; box-sizing:border-box;
-    border-radius:12px; border:1px solid rgba(0,0,0,.14);
-    background:#eef2ff; padding:12px 14px; font-size:.96rem;
-  }
-
-  .errorlist{ margin:.35rem 0 0; padding-left:1rem; color:#b00020; font-size:.85rem }
-  .nonfield{ margin:.25rem 0 0; color:#b00020; font-size:.9rem }
-
-  .row-actions{ display:flex; justify-content:flex-end; margin-top:6px; }
-  .link{ color:#111827; text-decoration:none; font-size:.9rem }
-  .link:hover{ text-decoration:underline }
-
-  .btn{
-    margin-top:14px; width:100%;
-    border:none; cursor:pointer;
-    border-radius:14px; padding:12px 16px;
-    font-weight:600; letter-spacing:.2px;
-    background:#0f172a; color:#fff;
-  }
-
-  .messages{ margin:10px 0 0; padding-left:1rem; color:#065f46; font-size:.92rem }
-  .foot{ margin-top:12px; font-size:.92rem; color:#4b5563 }
-</style>
+</script>
 {% endblock meta %}
 
 {% block content %}
-<div class="auth-wrap">
-  <div class="card">
-    <div class="head">
-      <h1 class="title">Welcome Back</h1>
-      <p class="sub">Sign in to continue</p>
+<div class="min-h-[calc(100dvh-4rem)] grid place-items-center p-4 bg-gradient-radial">
+  <div class="w-[min(420px,92vw)] rounded-[18px] p-[22px_20px] bg-gradient-card border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
+    <div class="mb-3">
+      <h1 class="m-0 text-[1.35rem] tracking-[0.2px] font-bold">Welcome Back</h1>
+      <p class="mt-0.5 mb-0 text-textGray text-[0.92rem]">Sign in to continue</p>
     </div>
 
-    <form method="POST">
+    <form method="POST" class="space-y-3">
       {% csrf_token %}
       {% if form.non_field_errors %}
-        <div class="nonfield">{{ form.non_field_errors }}</div>
+        <div class="mt-1 text-error text-[0.9rem]">{{ form.non_field_errors }}</div>
       {% endif %}
 
-      <div class="form-row">
-        <label for="{{ form.username.id_for_label }}">Username</label>
-        {{ form.username }}
+      <div class="my-3">
+        <label for="{{ form.username.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Username</label>
+        <input type="text" name="username" id="{{ form.username.id_for_label }}" 
+               class="block w-full rounded-xl border border-black/[0.14] bg-white py-3 px-3.5 text-[0.96rem]">
         {{ form.username.errors }}
       </div>
 
-      <div class="form-row">
-        <label for="{{ form.password.id_for_label }}">Password</label>
-        {{ form.password }}
+      <div class="my-3">
+        <label for="{{ form.password.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Password</label>
+        <input type="password" name="password" id="{{ form.password.id_for_label }}"
+               class="block w-full rounded-xl border border-black/[0.14] bg-white py-3 px-3.5 text-[0.96rem]">
         {{ form.password.errors }}
       </div>
 
-      <div class="row-actions">
-        <a href="#" class="link">Forgot password?</a>
+      <div class="flex justify-end mt-1.5">
+        <a href="#" class="text-linkText no-underline text-[0.9rem] hover:underline">Forgot password?</a>
       </div>
 
-      <button type="submit" class="btn">Sign In</button>
+      <button type="submit"
+        class="w-full mt-6 mb-2 py-3.5 px-4 bg-white text-[#111827] text-[0.95rem] font-bold tracking-wide rounded-2xl border border-[#111827]
+              hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
+        Sign In
+      </button>
     </form>
 
     {% if messages %}
-      <ul class="messages">
+      <ul class="mt-2.5 pl-4 text-success text-[0.92rem]">
         {% for message in messages %}<li>{{ message }}</li>{% endfor %}
       </ul>
     {% endif %}
 
-    <p class="foot">Don't have an account?
-      <a class="link" href="{% url 'main:register' %}">Sign Up</a>
+    <p class="mt-3 text-[0.92rem] text-textGray">Don't have an account?
+      <a class="text-linkText no-underline hover:underline font-bold" href="{% url 'main:register' %}">Sign Up</a>
     </p>
   </div>
 </div>

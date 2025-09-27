@@ -4,7 +4,7 @@ from main.views import login_user
 from main.views import logout_user 
 from main.views import (
     show_main, create_product, show_product,
-    show_xml, show_json, show_xml_by_id, show_json_by_id
+    show_xml, show_json, show_xml_by_id, show_json_by_id, edit_product, delete_product
 )
 
 
@@ -21,4 +21,6 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login_user, name='login'),
     path('logout/', logout_user, name='logout'),
+    path("product/<uuid:id>/edit/", edit_product, name="edit_product"),
+    path("product/<uuid:id>/delete/", delete_product, name="delete_product"),
 ]

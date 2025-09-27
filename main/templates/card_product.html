@@ -1,0 +1,53 @@
+{# templates/card_product.html #}
+<div>
+  <div class="card relative rounded-[14px] border border-black/[0.14] shadow-[0_6px_16px_rgba(0,0,0,0.06)] p-2 {{ cardbg }}">
+    <div class="grid grid-cols-[140px_1fr] gap-2 min-h-[110px] items-stretch">
+      <!-- LEFT: image -->
+      <div class="border-[1.5px] border-black/20 rounded-xl overflow-hidden bg-[#f6f6f6] h-[110px]">
+        {% if product.thumbnail %}
+          <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-full object-cover block">
+        {% else %}
+          <div class="h-full flex items-center justify-center text-[#888]">No Image</div>
+        {% endif %}
+      </div>
+
+      <!-- RIGHT: text -->
+      <div class="border-[1.5px] border-black/20 rounded-xl p-[8px_10px] grid grid-rows-[auto_auto] gap-1.5">
+        <div class="flex flex-col items-start gap-1">
+          <span class="inline-block text-[0.7rem] tracking-[0.06em] uppercase bg-white border border-black/[0.12] py-[0.16rem] px-2 rounded-full">
+            Product {{ counter }}
+          </span>
+          <h3 class="m-0 text-[1.2rem] leading-[1.1] font-bold">{{ product.name }}</h3>
+        </div>
+
+        <div class="w-full h-[1px] bg-black/[0.18] my-0.5"></div>
+
+        <div class="grid grid-cols-[1fr_auto] items-center gap-2">
+          <p class="m-0 text-[#222] text-[0.9rem]">
+            {% if product.category %}{{ product.get_category_display|default:product.category }}{% endif %}
+            {% if product.team %} — {{ product.team }}{% endif %}
+          </p>
+          <div class="flex items-center gap-2">
+            <a class="px-[0.7rem] py-[0.32rem] text-[0.85rem] bg-white text-primary border border-primary rounded-xl
+                      hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors"
+               href="{% url 'main:show_product' product.id %}">Detail</a>
+
+            <a class="px-[0.7rem] py-[0.32rem] text-[0.85rem] bg-white text-primary border border-primary rounded-xl
+                      hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors"
+               href="{% url 'main:edit_product' product.id %}">Edit</a>
+
+            <form method="post" action="{% url 'main:delete_product' product.id %}">
+              {% csrf_token %}
+              <button type="submit"
+                      class="px-[0.7rem] py-[0.32rem] text-[0.85rem] bg-white text-[#b91c1c] border border-[#b91c1c] rounded-xl
+                             hover:bg-[#b91c1c] hover:text-white transition-colors">
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

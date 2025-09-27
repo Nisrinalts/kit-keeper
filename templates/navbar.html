@@ -1,0 +1,101 @@
+{# templates/navbar.html #}
+<nav class="fixed top-0 left-0 right-0 z-50">
+  <div class="px-4 md:px-8">
+    <!-- kotak container: rounded + blur -->
+    <div class="max-w-[1200px] mx-auto rounded-[16px]
+                bg-white/80 backdrop-blur border border-black/10
+                shadow-[0_10px_26px_rgba(0,0,0,0.12)]">
+      <div class="flex items-center justify-between px-4 py-2.5">
+        <!-- Brand -->
+        <a href="{% url 'main:show_main' %}"
+           class="text-lg font-extrabold bg-gradient-to-r from-fuchsia-500 to-rose-400 bg-clip-text text-transparent">
+          KitKeeper
+        </a>
+
+        <!-- Menu desktop -->
+        <div class="hidden md:flex items-center gap-3">
+          <!-- Home: hover pink -->
+          <a href="{% url 'main:show_main' %}"
+             class="px-3 py-2 rounded-[12px] bg-white border border-[#e5e7eb] text-[#111827]
+                    hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
+            Home
+          </a>
+          <!-- Add Product: hover biru -->
+          <a href="{% url 'main:create_product' %}"
+             class="px-3 py-2 rounded-[12px] bg-white border border-[#e5e7eb] text-[#111827]
+                    hover:bg-[#60a5fa] hover:text-white hover:border-[#60a5fa] transition">
+            Add Product
+          </a>
+          <!-- Collections: belum aktif -->
+          <button type="button" aria-disabled="true" title="Coming soon ✨"
+                  class="px-3 py-2 rounded-[12px] bg-white border border-[#e5e7eb] text-[#111827] opacity-90 cursor-not-allowed">
+            Collections
+          </button>
+
+          <!-- Username: teks saja -->
+          {% if request.user.is_authenticated %}
+            <span class="ml-1 text-[#374151]">
+              <span class="font-semibold text-[#111827]">{{ request.user.username }}</span>
+            </span>
+          {% endif %}
+
+          <!-- Logout: hover merah -->
+          <a href="{% url 'main:logout' %}"
+             class="px-3 py-2 rounded-[12px] bg-white border border-[#e5e7eb] text-[#111827]
+                    hover:bg-[#ef4444] hover:text-white hover:border-[#ef4444] transition">
+            Logout
+          </a>
+        </div>
+
+        <!-- Toggle mobile -->
+        <button id="nav-toggle"
+        class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-[10px]
+               border border-[#e5e7eb] bg-white text-[#111827]
+               hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition"
+        aria-label="Toggle navigation" aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        </button>
+      </div>
+
+      <!-- Menu mobile -->
+      <div id="nav-menu-mobile" class="hidden md:hidden">
+        <div class="mt-2 border-t border-black/10 px-4 py-3">
+          <nav class="grid gap-3 text-[#111827]">
+            <a href="{% url 'main:show_main' %}" class="py-1 text-lg">Home</a>
+            <a href="{% url 'main:create_product' %}" class="py-1 text-lg">Add Product</a>
+            <button type="button" class="py-1 text-lg text-[#6b7280] cursor-not-allowed" aria-disabled="true">
+              Collections
+            </button>
+      
+            <div class="my-3 h-px bg-black/10"></div>
+      
+            {% if request.user.is_authenticated %}
+              <div class="leading-tight">
+                <div class="font-semibold">{{ request.user.username }}</div>
+                {# <div class="text-sm text-[#6b7280]">optional subtext</div> #}
+              </div>
+              <a href="{% url 'main:logout' %}" class="py-1 text-lg text-[#ef4444]">Logout</a>
+            {% endif %}
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Spacer supaya konten ga ketutup navbar fixed -->
+<div class="h-[68px] md:h-[76px]"></div>
+
+<script>
+  (function () {
+    const btn = document.getElementById('nav-toggle');
+    const menu = document.getElementById('nav-menu-mobile');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function () {
+      menu.classList.toggle('hidden');
+      btn.setAttribute('aria-expanded', String(!menu.classList.contains('hidden')));
+    });
+  })();
+</script>

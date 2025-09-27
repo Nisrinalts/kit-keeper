@@ -1,0 +1,15 @@
+
+:root {
+    --kk-pink: #ffb6c1;       
+    --kk-soft-shadow: 0 14px 32px rgba(0,0,0,.14);
+  }
+  
+  .empty-bounce { animation: kk-bounce 2s ease-in-out infinite; }
+  @keyframes kk-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+  
+  .kk-shadow-card { box-shadow: var(--kk-soft-shadow); }
+  .kk-border-soft { border: 1px solid rgba(0,0,0,.12); }
+  

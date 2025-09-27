@@ -16,18 +16,15 @@ from django.shortcuts import render, redirect
 
 @login_required(login_url='/login')
 def show_main(request):
-    filter_type = request.GET.get("filter", "all")  
-    if filter_type == "my":
-        products = Product.objects.filter(user=request.user)
-    else:
-        products = Product.objects.all()
+    tab = request.GET.get("tab", "all")
+    qs = Product.objects.all().order_by("-pk")
+    if tab == "mine" and request.user.is_authenticated:
+        qs = qs.filter(user=request.user)
 
     context = {
-        "npm": "2406354000",
-        "name": request.user.username,
-        "class": "PBP F",
-        "products": products,
-        "last_login": request.COOKIES.get("last_login", "Never"),
+        "products": qs,
+        "active_tab": "mine" if tab == "mine" else "all",
+        "last_login": request.COOKIES.get("last_login") or request.session.get("last_login"),
     }
     return render(request, "main.html", context)
 
@@ -108,3 +105,22 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse("main:login"))
     response.delete_cookie("last_login")
     return response
+
+def edit_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    if request.method == "POST":
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Product updated!")
+            return redirect("main:show_product", id=product.id)
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, "edit_product.html", {"form": form, "product": product})
+
+def delete_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    product.delete()
+    messages.success(request, "Product deleted!")
+    return HttpResponseRedirect(reverse("main:show_main"))

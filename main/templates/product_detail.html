@@ -2,70 +2,77 @@
 
 {% block title %}{{ product.name }} — KitKeeper{% endblock %}
 
-{% block meta %}
-<style>
-  .container { background: radial-gradient(circle, #fff7cc, #fff0b3, #ffeaa7) !important; }
-
-  .detail-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 1.25rem;
-    align-items: start;
-  }
-  @media (max-width: 900px) {
-    .detail-grid { grid-template-columns: 1fr; }
-  }
-
-  .photo-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.08);
-    padding: 12px;
-  }
-  .photo-card img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 12px;
-  }
-  .kv { margin: .4rem 0; }
-  .kv b { display:inline-block; min-width: 130px; }
-</style>
-{% endblock %}
-
 {% block content %}
-  <a class="button" href="{% url 'main:show_main' %}">← Back</a>
+<!-- FULL-BLEED PINK BG (sama seperti create_product) -->
+<div class="fixed inset-0 -z-10 bg-[radial-gradient(circle,_#ffb6c1,_#ffc1cc,_#ffe4ec)]"></div>
 
-  <div class="detail-grid" style="margin-top:1rem;">
-    <div>
-      <h2 style="margin:.25rem 0 1rem 0;">{{ product.name }}</h2>
+<div class="min-h-screen flex items-start md:items-center">
+  <div class="w-full max-w-[980px] mx-auto p-4">
+    <!-- Kartu kuning -->
+    <div class="rounded-[20px] p-6 md:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.12)]
+                bg-[radial-gradient(circle,_#fff7cc,_#fff0b3,_#ffeaa7)]">
 
-      <p class="kv"><b>Price:</b> Rp{{ product.price }}</p>
-      <p class="kv"><b>Category:</b> {{ product.get_category_display }}</p>
-      <p class="kv"><b>Description:</b> {{ product.description }}</p>
+      <!-- Back -->
+      <a href="{% url 'main:show_main' %}"
+         class="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-[12px]
+                bg-white border border-[#111827]/20 text-[#111827]
+                hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
+        ← Back
+      </a>
 
-      <p class="kv"><b>Size:</b> {{ product.get_size_display|default:"-" }}</p>
-      <p class="kv"><b>Sleeve:</b> {{ product.get_sleeve_type_display|default:"-" }}</p>
+      <div class="grid gap-8 md:grid-cols-[1fr_auto]">
+        <!-- LEFT: Detail -->
+        <div>
+          <h1 class="text-[28px] leading-[34px] font-extrabold text-[#111827] mb-4">
+            {{ product.name }}
+          </h1>
 
-      <p class="kv"><b>Team:</b> {{ product.team|default:"-" }}</p>
-      <p class="kv"><b>Season:</b> {{ product.season|default:"-" }}</p>
-      <p class="kv"><b>Condition:</b> {{ product.condition|default:"-" }}</p>
-      <p class="kv"><b>Manufacturer:</b> {{ product.manufacturer|default:"-" }}</p>
-      <p class="kv"><b>Stock:</b> {{ product.stock }}</p>
-      <p class="kv"><b>Owner:</b> {{ product.user }}</p>
-    </div>
-
-    <div>
-      {% if product.thumbnail %}
-        <div class="photo-card">
-          <img src="{{ product.thumbnail }}" alt="{{ product.name }}">
+          <div class="space-y-2 text-[#111827]">
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Price:</span><span>Rp{{ product.price }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Category:</span><span>{{ product.get_category_display|default:product.category }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Description:</span><span>{{ product.description }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Size:</span><span>{{ product.get_size_display|default:"-" }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Sleeve:</span><span>{{ product.get_sleeve_type_display|default:"-" }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Team:</span><span>{{ product.team|default:"-" }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Season:</span><span>{{ product.season|default:"-" }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Condition:</span><span>{{ product.condition|default:"-" }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Manufacturer:</span><span>{{ product.manufacturer|default:"-" }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Stock:</span><span>{{ product.stock|default:"0" }}</span></p>
+            <p class="flex gap-4"><span class="min-w-[110px] font-bold">Owner:</span><span>{{ product.user|default:"None" }}</span></p>
+          </div>
         </div>
-      {% else %}
-        <div class="photo-card" style="text-align:center; padding:40px;">
-          <em>No image</em>
+
+        <!-- RIGHT: Foto (padding sama di semua sisi) -->
+        <div class="justify-self-start">
+          <div class="w-[340px] rounded-[16px] bg-white border border-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.12)] p-4">
+            <div class="w-full rounded-[12px] overflow-hidden bg-[#e5e7eb] aspect-square">
+              {% if product.thumbnail %}
+                <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-full object-cover block">
+              {% else %}
+                <div class="w-full h-full flex items-center justify-center text-[#888]">
+                  <em>No image</em>
+                </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
-      {% endif %}
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <a href="{% url 'main:edit_product' product.id %}"
+           class="px-4 py-2 rounded-[12px] bg-white border border-[#111827] text-[#111827] font-medium
+                  hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
+          Edit
+        </a>
+        <form method="post" action="{% url 'main:delete_product' product.id %}">
+          {% csrf_token %}
+          <button type="submit"
+                  class="px-4 py-2 rounded-[12px] bg-white border border-[#b91c1c] text-[#b91c1c] font-medium
+                         hover:bg-[#b91c1c] hover:text-white transition">
+            Delete
+          </button>
+        </form>
+      </div>
     </div>
   </div>
+</div>
 {% endblock %}

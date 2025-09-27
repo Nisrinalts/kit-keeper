@@ -1,153 +1,103 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Product List — KitKeeper{% endblock title %}
 
 {% block meta %}
-<style>
-  .cards{ display:grid; gap:12px; }
-
-  .card{
-    position:relative;
-    border-radius:14px;
-    border:1px solid rgba(0,0,0,.14);
-    box-shadow:0 6px 16px rgba(0,0,0,.06);
-    padding:8px;
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        backgroundImage: {
+          'gradient-radial': 'radial-gradient(circle, #ffb6c1, #ffc1cc, #ffe4ec)',
+          'gradient-card': 'linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8)',
+        },
+        colors: {
+          'card-1': '#cae5f7',
+          'card-2': '#fad1ba',
+          'card-3': '#fff7cc',
+          'card-4': '#befacb',
+          'hover-pink': '#ffb6c1', 
+        }
+      }
+    }
   }
-  .cards > div:nth-child(4n+1) .card{ background:#cae5f7; }
-  .cards > div:nth-child(4n+2) .card{ background:#fad1ba; }
-  .cards > div:nth-child(4n+3) .card{ background:#fff7cc; }
-  .cards > div:nth-child(4n+4) .card:hover{ background:#befacb; }
-
-  :root{
-    --photo-w: 140px;
-    --row-h: 110px;
-  }
-
-  .card-inner{
-    display:grid;
-    grid-template-columns: var(--photo-w) 1fr;
-    gap:8px;
-    align-items:stretch;
-    min-height: var(--row-h);
-  }
-
-  .frame-left{
-    border:1.5px solid rgba(0,0,0,.20);
-    border-radius:12px;
-    overflow:hidden;
-    background:#f6f6f6;
-    height: var(--row-h);
-  }
-  .frame-left img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
-
-  .frame-right{
-    border:1.5px solid rgba(0,0,0,.20);
-    border-radius:12px;
-    padding:8px 10px;
-    display:grid;
-    grid-template-rows: auto auto;
-    row-gap:6px;
-  }
-
-  .right-top{
-    display:flex; flex-direction:column; align-items:flex-start; gap:4px;
-  }
-  .label{
-    display:inline-block;
-    font-size:.7rem; letter-spacing:.06em; text-transform:uppercase;
-    background:#fff; border:1px solid rgba(0,0,0,.12);
-    padding:.16rem .5rem; border-radius:999px;
-  }
-  .title{ margin:0; font-size:1.2rem; line-height:1.1; }
-
-  .divider{ width:100%; height:1px; background: rgba(0,0,0,.18); margin:2px 0; }
-
-  .right-bottom{
-    display:grid; grid-template-columns: 1fr auto; align-items:center; column-gap:8px;
-  }
-  .sub{ margin:0; color:#222; font-size:.9rem; }
-  .btn-detail{ padding:.32rem .7rem; font-size:.85rem; }
-
-  @media (max-width: 900px){
-    :root{ --photo-w: 120px; --row-h: 100px; }
-  }
-
-  .header-actions { display:flex; gap:10px; }
-
-  /* tiny info bar for username + last_login */
-  .info-bar{
-    margin:8px 0 14px;
-    display:flex; flex-wrap:wrap; gap:12px;
-    align-items:center; color:#374151; font-size:.95rem;
-  }
-  .info-bar .muted{ color:#6b7280; }
-  .dot{ opacity:.6; }
-</style>
+</script>
+<link rel="stylesheet" href="{% static 'css/global.css' %}">
 {% endblock meta %}
 
 {% block content %}
-<header>
-  <div>
-    <h1>KitKeeper</h1>
-  </div>
-
-  <div class="header-actions">
-    <a class="button" href="{% url 'main:create_product' %}">+ Add Product</a>
-    <a class="button" href="{% url 'main:logout' %}">Logout</a>
-  </div>
-</header>
-
-<!-- show logged-in username + last_login cookie -->
-<section class="info-bar">
-  <span>Welcome, <strong>{{ request.user.username }}</strong></span>
-  <span class="dot">•</span>
-  <span class="muted">Last login: {{ last_login }}</span>
-</section>
-
-{% if products %}
-  <div class="cards">
-    {% for p in products %}
+<!-- Add pink gradient to page background -->
+<div class="min-h-[calc(100dvh-4rem)] p-4 bg-gradient-radial">
+  <!-- Add green gradient to container -->
+  <div class="max-w-[1200px] mx-auto rounded-[18px] p-6 bg-gradient-card border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
+    <header class="grid gap-3 md:grid-cols-[1fr_auto] items-start mb-4">
+      <!-- KIRI: filter + welcome (hanya di All) -->
       <div>
-        <div class="card">
-          <div class="card-inner">
-            <!-- LEFT: image -->
-            <div class="frame-left">
-              {% if p.thumbnail %}
-                <img src="{{ p.thumbnail }}" alt="{{ p.name }}">
-              {% else %}
-                <div style="height:100%;display:flex;align-items:center;justify-content:center;color:#888;">
-                  No Image
-                </div>
-              {% endif %}
-            </div>
-
-            <!-- RIGHT: text -->
-            <div class="frame-right">
-              <div class="right-top">
-                <span class="label">Product {{ forloop.counter }}</span>
-                <h3 class="title">{{ p.name }}</h3>
-              </div>
-
-              <div class="divider"></div>
-
-              <div class="right-bottom">
-                <p class="sub">
-                  {% if p.category %}{{ p.get_category_display|default:p.category }}{% endif %}
-                  {% if p.team %} — {{ p.team }}{% endif %}
-                </p>
-                <a class="button btn-detail" href="{% url 'main:show_product' p.id %}">Detail</a>
-              </div>
-            </div>
-          </div>
+        <div class="flex items-center gap-2">
+          <a href="{% url 'main:show_main' %}?tab=all"
+             class="px-3 py-2 rounded-[12px] border text-[0.95rem] transition
+                    {% if active_tab == 'all' %}
+                      bg-[#fff7cc] border-[#f5df95] text-[#111827] font-semibold
+                    {% else %}
+                      bg-white border-[#e5e7eb] text-[#111827]
+                      hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1]
+                    {% endif %}">
+            All Products
+          </a>
+    
+          <a href="{% url 'main:show_main' %}?tab=mine"
+             class="px-3 py-2 rounded-[12px] border text-[0.95rem] transition
+                    {% if active_tab == 'mine' %}
+                      bg-[#fff7cc] border-[#f5df95] text-[#111827] font-semibold
+                    {% else %}
+                      bg-white border-[#e5e7eb] text-[#111827]
+                      hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1]
+                    {% endif %}">
+            My Products
+          </a>
         </div>
+    
+        {% if active_tab == 'all' %}
+          <p class="mt-1 text-[0.95rem] text-[#374151]">
+            Welcome, <strong>{{ request.user.username }}</strong>
+          </p>
+        {% endif %}
       </div>
-    {% endfor %}
+    
+      <!-- KANAN: last login -->
+      <div class="text-[0.95rem] text-[#6b7280] md:text-right">
+        Last login: {{ last_login }}
+      </div>
+    </header>
+
+    {% if products %}
+      <div class="grid gap-3">
+        {% for p in products %}
+          {% cycle 'bg-[#cae5f7]' 'bg-[#fad1ba]' 'bg-[#fff7cc]' 'bg-[#befacb]' as cardbg silent %}
+          {% include 'card_product.html' with product=p counter=forloop.counter cardbg=cardbg %}
+      {% endfor %}
+      </div>
+      {% else %}
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        {# Letakkan gambar di static/img/empty-products.png #}
+        <img src="{% static 'img/empty-products.png' %}" alt="No products"
+          class="w-36 h-36 object-cover rounded-xl shadow-md" />
+        {% if active_tab == 'mine' %}
+          <h3 class="mt-4 text-xl font-semibold text-[#111827]">No products in your collection</h3>
+          <p class="text-[#6b7280]">Start by adding your first product.</p>
+        {% else %}
+          <h3 class="mt-4 text-xl font-semibold text-[#111827]">No products found</h3>
+          <p class="text-[#6b7280]">Be the first to add a product to KitKeeper.</p>
+        {% endif %}
+    
+        <a href="{% url 'main:create_product' %}"
+           class="mt-3 inline-block px-4 py-2 bg-white text-primary border border-primary rounded-xl
+                  hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
+          + Add Product
+        </a>
+      </div>
+    {% endif %}
+    
   </div>
-{% else %}
-  <p>No products yet.</p>
-{% endif %}
+</div>
 {% endblock content %}
