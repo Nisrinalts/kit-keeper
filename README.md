@@ -134,3 +134,59 @@ TUGAS 4
     Di main.html aku tampilkan bar kecil di bawah header:
     Welcome, {{ request.user.username }} • Last login: {{ last_login }}
     Semua view yang harus aman—show_main, create_product, show_product—aku beri @login_required agar non-logged user otomatis diarahkan ke /login
+
+
+TUGAS 5
+1. Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+Dalam CSS ada konsep specificity atau tingkat kekuatan selector. Urutan prioritasnya seperti ini:
+    1. Inline style (style="..." langsung di elemen HTML) akan selalu menang karena paling spesifik.
+    2. Selector dengan ID (#id-name) lebih kuat daripada class.
+    3. Selector dengan class, attribute, atau pseudo-class (misalnya .card, [type="text"], :hover) berada di bawah ID.
+    4. Selector dengan element atau pseudo-element (h1, p, ::before) punya kekuatan paling lemah.
+    5. Jika dua aturan punya tingkat spesifik yang sama, aturan yang dideklarasikan paling akhir akan dipakai.
+Dengan kata lain: inline > id > class > element, dan posisi terakhir juga berpengaruh.
+2. Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design, serta jelaskan mengapa!
+Responsive design penting karena pengguna mengakses website dari perangkat yang sangat beragam: HP, tablet, maupun laptop/PC. Tanpa desain responsif, tampilan bisa berantakan, pengguna harus zoom in/out, tombol jadi kecil, dan pengalaman mereka jadi buruk. Manfaatnya antara lain yaitu User experience lebih baik, mudah digunakan di semua device, Aksesibilitas meningkat, tidak ada pengguna yang kesulitan membaca konten, dan juga Efisiensi: kita hanya butuh satu kode dasar, tanpa membuat versi berbeda untuk mobile/desktop.
+- Contoh aplikasi yang sudah menerapkan responsive design: Tokopedia: di desktop produknya tampil 4–5 kolom, sedangkan di HP otomatis berubah jadi 1–2 kolom, tombol tetap nyaman untuk ditekan.
+- Contoh aplikasi yang belum responsif:
+
+3. Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+Margin adalah ruang kosong di luar elemen, berguna untuk mengatur jarak antar elemen.
+Border adalah garis tepi yang membungkus elemen, biasanya dipakai sebagai bingkai.
+Padding adalah ruang kosong di dalam elemen, antara konten dengan border.
+Contoh penggunaannya dalam web:
+- Margin dipakai agar antar-kartu produk tidak berhimpitan.
+- Border dipakai untuk memberi frame agar setiap kartu lebih jelas.
+- Padding dipakai supaya teks di dalam tombol atau kartu tidak menempel ke tepi.
+
+4. Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+Flexbox adalah sistem layout 1 dimensi, cocok untuk mengatur elemen secara horizontal atau vertikal. Misalnya: membuat navbar, menyusun tombol dalam satu baris, atau memposisikan elemen ke tengah halaman.
+Grid Layout adalah sistem layout 2 dimensi, artinya bisa mengatur baris dan kolom sekaligus. Cocok dipakai untuk membuat galeri produk, dashboard, atau layout halaman yang kompleks.
+Perbedaan utama:
+- Kalau hanya perlu susunan linear (misalnya satu baris menu), gunakan Flexbox.
+- Kalau perlu susunan kotak/galeri (misalnya daftar produk multi-kolom), gunakan Grid.
+
+5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+1. Menambahkan fitur edit & delete product
+    - Aku membuat view baru untuk edit dan delete, lalu menghubungkannya dengan URL pattern baru.
+    - Di halaman daftar produk dan halaman detail, aku menambahkan tombol "Edit" dan "Delete" supaya user bisa langsung melakukan aksi tersebut.
+    - Untuk delete, aku tambahkan konfirmasi agar tidak terhapus tanpa sengaja.
+    - Supaya aman, aku batasi hanya pemilik produk yang bisa melakukan edit dan delete.
+2. Mengubah tampilan halaman (login, register, tambah, edit, detail produk)
+    - Aku mengonversi desain lama yang masih pakai CSS biasa menjadi Tailwind CSS.
+    - Semua ukuran, warna, dan posisi aku sesuaikan agar tampilannya menarik, tapi tetap konsisten di seluruh halaman.
+    - Login & register aku buat dengan kartu sederhana di tengah layar, tombol dibuat lebih jelas, input diberi padding dan border yang halus.
+    - Halaman detail produk aku ubah jadi dua kolom: bagian kiri menampilkan foto produk, bagian kanan menampilkan deskripsi, harga, serta tombol aksi.
+3. Halaman daftar produk lebih menarik dan responsif
+    - Aku menambahkan kondisi khusus: jika produk kosong, tampilkan ilustrasi gambar dan teks “Belum ada produk”.
+    - Jika ada produk, tampilannya menggunakan card dengan desain baru, berbeda dari tutorial. Setiap card memuat foto produk, nama, harga, deskripsi singkat, serta tombol edit dan delete.
+    - Layout daftar produk dibuat dengan CSS Grid sehingga jumlah kolom menyesuaikan ukuran layar: 1 kolom di HP, 2–3 kolom di tablet, dan 4 kolom di desktop.
+4. Navbar responsif
+    - Aku menambahkan navbar di base.html supaya muncul di semua halaman.
+    - Di desktop, navbar tampil sebagai menu horizontal.
+    - Di mobile, navbar berubah jadi menu burger yang bisa diklik untuk menampilkan daftar link.
+    - Isi navbar meliputi link ke halaman utama, tambah produk, login/logout.
+5. Responsif di seluruh halaman
+    - Aku menggunakan breakpoint bawaan Tailwind (sm:, md:, lg:) untuk mengatur tampilan sesuai ukuran layar.
+    - Semua halaman sudah aku uji di ukuran mobile, tablet, dan desktop supaya tetap nyaman dilihat.
+Dengan alur ini, semua checklist dari tugas 5 berhasil aku implementasikan: ada fitur edit & delete, tampilan halaman yang dikustomisasi, daftar produk dengan kondisi empty dan non-empty, card produk dengan tombol aksi, dan navbar responsif.

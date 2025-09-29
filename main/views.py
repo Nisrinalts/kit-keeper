@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render, redirect
+from django.http import Http404
 
 @login_required(login_url='/login')
 def show_main(request):
@@ -106,21 +107,53 @@ def logout_user(request):
     response.delete_cookie("last_login")
     return response
 
+@login_required
 def edit_product(request, id):
+    # 1) Ambil objek (id kamu bertipe UUID, URL pattern sudah <uuid:id>)
     product = get_object_or_404(Product, pk=id)
+
+    # 2) Guard data legacy: kalau belum punya owner, tolak dan beri info
+    if product.user_id is None:
+        messages.error(request, "Produk ini belum memiliki owner. Atur owner terlebih dahulu.")
+        return redirect("main:show_main")
+
+    # 3) Hanya owner (atau superuser) yang boleh edit
+    if product.user_id != request.user.id and not request.user.is_superuser:
+        # Samarkan resource dengan 404
+        raise Http404("Product not found")
+
+    # 4) Proses form
     if request.method == "POST":
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
-            messages.success(request, "Product updated!")
-            return redirect("main:show_product", id=product.id)
+            messages.success(request, "Produk berhasil diperbarui.")
+            return redirect("main:show_main")
     else:
         form = ProductForm(instance=product)
 
     return render(request, "edit_product.html", {"form": form, "product": product})
 
+@login_required
 def delete_product(request, id):
+    # Ambil objeknya dulu
     product = get_object_or_404(Product, pk=id)
+
+    # Hanya proses jika POST (button submit)
+    if request.method != "POST":
+        return redirect("main:show_main")
+
+    # Kalau product belum punya owner (legacy data), jangan izinkan hapus
+    if product.user_id is None:
+        messages.error(request, "Produk ini belum memiliki owner. Hubungi admin atau ubah owner dulu.")
+        return redirect("main:show_main")
+
+    # Owner check: hanya pemilik (atau superuser) yang boleh
+    if product.user_id != request.user.id and not request.user.is_superuser:
+        # samarkan dengan 404 agar endpoint tidak dapat dipetakan oleh user lain
+        raise Http404("Product not found")
+
+    # Lolos semua check -> hapus
     product.delete()
-    messages.success(request, "Product deleted!")
-    return HttpResponseRedirect(reverse("main:show_main"))
+    messages.success(request, "Produk berhasil dihapus.")
+    return redirect("main:show_main")

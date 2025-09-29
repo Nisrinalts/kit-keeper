@@ -36,20 +36,23 @@
               Detail
             </a>
 
+            {% if user.is_authenticated and product.user_id == user.id %}
             <a href="{% url 'main:edit_product' product.id %}"
-               class="inline-flex items-center justify-center px-3 py-1.5 text-[0.85rem] bg-white text-primary border border-primary rounded-xl
-                      hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
+              class="px-3 py-2 rounded-lg bg-amber-500 text-white hover:bg-amber-600">
               Edit
             </a>
+          {% endif %}
 
-            <form method="post" action="{% url 'main:delete_product' product.id %}" class="inline">
+            {% if user.is_authenticated and product.user_id == user.id %}
+            <form action="{% url 'main:delete_product' product.id %}" method="post" class="inline">
               {% csrf_token %}
               <button type="submit"
-                      class="inline-flex items-center justify-center px-3 py-1.5 text-[0.85rem] bg-white text-[#b91c1c] border border-[#b91c1c] rounded-xl
-                             hover:bg-[#b91c1c] hover:text-white transition-colors">
+                onclick="return confirm('Are you sure you want to delete {{ product.name }}? This action cannot be undone.');"
+                class="px-3 py-2 rounded-lg bg-rose-500 text-white hover:bg-rose-600">
                 Delete
               </button>
             </form>
+          {% endif %}
           </div>
         </div>
 
