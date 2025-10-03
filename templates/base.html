@@ -1,39 +1,76 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        window.tailwind = window.tailwind || {};
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#0f172a',
-                        error: '#b00020',
-                        success: '#065f46',
-                        textGray: '#4b5563',
-                        textDark: '#263238',
-                        linkText: '#111827',
-                    },
-                    backgroundImage: {
-                        'gradient-radial': 'radial-gradient(circle, #ffb6c1, #ffc1cc, #ffe4ec)',
-                        'gradient-card': 'linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8)',
-                        'gradient-yellow': 'radial-gradient(circle, #fff7cc, #fff0b3, #ffeaa7)', 
-                    },
-                }
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          /* === Palette baru === */
+          colors: {
+            primary:'#0f172a', error:'#b00020', success:'#065f46',
+            textGray:'#4b5563', textDark:'#263238', linkText:'#111827',
+            textBaseWhite:'#ffffff', 
+            /* swatches  */
+            'kk-rose':'#D2A3A9',
+            'kk-lilac':'#E6DCE5',
+            'kk-blush':'#EBC3C1',
+            'kk-peach':'#ECAD8F',
+            'kk-terra':'#AF6E4E',
+          },
+          /* Gradient */
+          backgroundImage: {
+            'kk-pink' : 'radial-gradient(circle, #F2D7D4, #EBC3C1, #E3ADA7)',  
+            'kk-rose' : 'radial-gradient(circle, #EED9DC, #D2A3A9, #C28F95)',  
+            'kk-amber': 'radial-gradient(circle, #F4D2C3, #E6B198, #F9E4D7)',
+            'kk-peach' : 'radial-gradient(circle, #F6D3C3, #ECAD8F, #E39B79)',
+          },
         }
-    </script>
-    {% block meta %}{% endblock meta %}
-    <title>{% block title %}KitKeeper{% endblock title %}</title>
+      }
+    }
+  </script>
+
+  <!-- global styles (bg-welcome, dll) -->
+  <link rel="stylesheet" href="{% static 'css/global.css' %}">
+
+  {% block meta %}{% endblock meta %}
+  <title>{% block title %}KitKeeper{% endblock title %}</title>
 </head>
-<body class="bg-gradient-radial min-h-screen p-8">
+    
+<script>
+    (function () {
+      if (window.__kkFormatPrice) return;
+      window.__kkFormatPrice = true;
+  
+      function formatPrices() {
+        var fmt = new Intl.NumberFormat('id-ID');
+        document.querySelectorAll('.kk-idr').forEach(function (el) {
+          var raw = el.getAttribute('data-idr');
+          if (raw == null) return;
+          var val = Number(raw); // pakai Number biar 1500000 atau 1500000.0 aman
+          if (!Number.isNaN(val)) {
+            el.textContent = fmt.format(val); // 1.500.000
+          }
+        });
+      }
+  
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', formatPrices);
+      } else {
+        formatPrices();
+      }
+    })();
+  </script>
+  
+<!-- HAPUS bg-gradient-radial supaya tidak menimpa gradient per-halaman -->
+<body class="min-h-screen p-8">
   {% if request.user.is_authenticated %}
     {% include 'navbar.html' %}
   {% endif %}
-    {% block content %}
-    {% endblock content %}
+  {% block content %}{% endblock content %}
 </body>
 </html>

@@ -4,13 +4,12 @@
 
 {% block content %}
 <!-- FULL-BLEED PINK BG -->
-<div class="fixed inset-0 -z-10 bg-[radial-gradient(circle,_#ffb6c1,_#ffc1cc,_#ffe4ec)]"></div>
+<div class="fixed inset-0 -z-10 bg-kk-pink"></div>
 
 <div class="min-h-screen flex items-start md:items-center">
   <div class="w-full max-w-[980px] mx-auto px-3 sm:p-4">
-    <!-- Kartu kuning -->
-    <div class="rounded-[20px] p-5 sm:p-6 md:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.12)]
-                bg-[radial-gradient(circle,_#fff7cc,_#fff0b3,_#ffeaa7)]">
+    <!-- Kartu dalem -->
+    <div class="bg-kk-peach rounded-[20px] p-5 sm:p-6 md:p-8 shadow-[0_12px_32px_rgba(0,0,0,0.12)]">
 
       <!-- Back -->
       <a href="{% url 'main:show_main' %}"
@@ -29,7 +28,8 @@
 
           <!-- grid label: value (lebih rapi di mobile) -->
           <div class="grid grid-cols-[110px_1fr] gap-x-3 gap-y-2 text-[#111827] text-sm sm:text-base">
-            <span class="font-bold">Price:</span>         <span>Rp{{ product.price }}</span>
+            <span class="font-bold">Price:</span>
+            <span>Rp <span class="kk-idr" data-idr="{{ product.price|default:0 }}">{{ product.price }}</span></span>
             <span class="font-bold">Category:</span>      <span>{{ product.get_category_display|default:product.category }}</span>
             <span class="font-bold">Description:</span>   <span>{{ product.description }}</span>
             <span class="font-bold">Size:</span>          <span>{{ product.get_size_display|default:"-" }}</span>
@@ -59,22 +59,29 @@
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="mt-5 md:mt-6 flex flex-col sm:flex-row sm:justify-end gap-2">
+      {% if user.is_authenticated and product.user_id == user.id %}
+      <div class="mt-4 flex gap-2">
+        <!-- EDIT -->
         <a href="{% url 'main:edit_product' product.id %}"
-           class="inline-flex items-center justify-center px-4 py-2 rounded-[12px] bg-white border border-[#111827] text-[#111827] font-medium
-                  hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
+           class="inline-flex items-center justify-center px-4 py-2.5 rounded-[12px]
+                  bg-white text-[#111827] border border-transparent
+                  hover:bg-[#D2A3A9] hover:text-white transition-colors">
           Edit
         </a>
-        <form method="post" action="{% url 'main:delete_product' product.id %}">
+      
+        <!-- DELETE -->
+        <form action="{% url 'main:delete_product' product.id %}" method="post"
+              onsubmit="return confirm('Delete {{ product.name }}? This cannot be undone.');">
           {% csrf_token %}
           <button type="submit"
-                  class="inline-flex items-center justify-center px-4 py-2 rounded-[12px] bg-white border border-[#b91c1c] text-[#b91c1c] font-medium
-                         hover:bg-[#b91c1c] hover:text-white transition">
+            class="inline-flex items-center justify-center px-4 py-2.5 rounded-[12px]
+                   bg-white text-[#111827] border border-transparent
+                   hover:bg-[#E07A5F] hover:text-white transition-colors">
             Delete
           </button>
         </form>
-      </div>
+      </div>      
+    {% endif %}
 
     </div>
   </div>

@@ -2,34 +2,59 @@
 {% load static %}
 {% block title %}Product List — KitKeeper{% endblock title %}
 
+
 {% block meta %}
 <script>
   tailwind.config = {
     theme: {
       extend: {
         backgroundImage: {
-          'gradient-radial': 'radial-gradient(circle, #ffb6c1, #ffc1cc, #ffe4ec)',
-          'gradient-card': 'linear-gradient(to right, #a8e6cf, #dcedc1, #f0f9e8)',
+          /* gradient pink (dipakai untuk BG halaman utama) */
+          'kk-pink':   'radial-gradient(circle, #F2D7D4, #EBC3C1, #E3ADA7)',
+          'kk-rose':   'radial-gradient(circle, #EED9DC, #D2A3A9, #C28F95)',
+          'kk-amber':  'radial-gradient(circle, #C98F70, #AF6E4E, #8F5336)',
         },
-        colors: {
-          'card-1': '#cae5f7',
-          'card-2': '#fad1ba',
-          'card-3': '#fff7cc',
-          'card-4': '#befacb',
-          'hover-pink': '#ffb6c1', 
-        }
       }
     }
   }
 </script>
 <link rel="stylesheet" href="{% static 'css/global.css' %}">
+
+<style>
+  /* background halaman penuh */
+  body {
+    background: radial-gradient(circle, #F2D7D4, #EBC3C1, #E3ADA7);
+  }
+</style>
+
 {% endblock meta %}
 
 {% block content %}
+<!-- HERO WELCOME -->
+<div class="mb-6">
+  <div class="rounded-2xl overflow-hidden border border-white/60 shadow-[0_12px_32px_rgba(0,0,0,.12)]">
+    <div class="relative h-52 sm:h-64 md:h-80 bg-welcome">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/25 via-black/5 to-transparent"></div>
+      <div class="absolute left-5 sm:left-7 bottom-5 sm:bottom-7">
+        <h1 class="text-white tracking-tight drop-shadow-[0_3px_10px_rgba(0,0,0,.35)]
+                   text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium">
+          <span>Welcome,&nbsp;</span>
+          <span class="font-extrabold">
+            {{ request.user.first_name|default:request.user.username|default:"Guest" }}
+          </span>
+        </h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- BG pink -->
-<div class="min-h-[calc(100dvh-4rem)] px-3 sm:px-4 py-4 bg-gradient-radial">
-  <!-- container hijau -->
-  <div class="max-w-screen-xl mx-auto rounded-[18px] p-4 sm:p-6 bg-gradient-card border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
+<div class="min-h-[calc(100dvh-4rem)] px-3 sm:px-4 py-4">
+  <!-- container  -->
+  <div class="max-w-screen-xl mx-auto rounded-[18px] p-4 sm:p-6
+            bg-[radial-gradient(circle,_#EED9DC,_#D2A3A9,_#C28F95)]
+            border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
     <header class="grid gap-2 sm:gap-3 md:grid-cols-[1fr_auto] items-start mb-4">
       <!-- KIRI: tab + welcome (hanya di All) -->
       <div>
@@ -58,27 +83,20 @@
             My Products
           </a>
         </div>
-
-        {% if active_tab == 'all' %}
-          <p class="mt-1 text-sm sm:text-[0.95rem] text-[#374151]">
-            Welcome, <strong>{{ request.user.username }}</strong>
-          </p>
-        {% endif %}
       </div>
 
       <!-- KANAN: last login -->
-      <div class="text-xs sm:text-[0.95rem] text-[#6b7280] md:text-right">
+      <div class="text-xs sm:text-[0.95rem] text-[#FFFFFF] md:text-right">
         Last login: {{ last_login }}
       </div>
     </header>
 
     {% if products %}
-      <div class="grid gap-3 sm:gap-4">
-        {% for p in products %}
-          {% cycle 'bg-[#cae5f7]' 'bg-[#fad1ba]' 'bg-[#fff7cc]' 'bg-[#befacb]' as cardbg silent %}
-          {% include 'card_product.html' with product=p counter=forloop.counter cardbg=cardbg %}
-        {% endfor %}
-      </div>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 justify-items-center">
+      {% for p in products %}
+        {% include 'card_product.html' with product=p counter=forloop.counter cardbg='bg-[#E6DCE5]' %}
+      {% endfor %}
+    </div>
     {% else %}
       <div class="flex flex-col items-center justify-center py-12 sm:py-16 text-center">
         <img src="{% static 'img/empty-products.png' %}" alt="No products"
@@ -100,4 +118,17 @@
     {% endif %}
   </div>
 </div>
+
+<script>
+  (function () {
+    if (window.__kkFormatPrice) return;
+    window.__kkFormatPrice = true;
+    var fmt = new Intl.NumberFormat('id-ID');
+    document.querySelectorAll('.kk-idr').forEach(function(el){
+      var val = parseInt(el.getAttribute('data-idr'), 10);
+      if (!isNaN(val)) el.textContent = fmt.format(val); // 1.234.567
+    });
+  })();
+</script>
+
 {% endblock content %}
