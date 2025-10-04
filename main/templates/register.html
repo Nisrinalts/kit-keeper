@@ -108,13 +108,13 @@
         if (!res.ok) {
           if (data?.errors) {
             for (const [name, msgs] of Object.entries(data.errors)) setFieldError(name, msgs);
-            err.textContent = "Periksa kembali input kamu.";
+            err.textContent = "Please check your input.";
           } else {
-            err.textContent = data?.detail || "Registrasi gagal.";
+            err.textContent = data?.detail || "Registration failed.";
           }
           err.classList.remove('hidden');
-          // opsional: toast error saat gagal
-          if (typeof showToast === 'function') showToast("Error", "Registrasi gagal.");
+          // Optional: toast error on failure
+          if (typeof showToast === 'function') showToast("Error", "Registration failed.");
           return;
         }
   
@@ -122,16 +122,16 @@
         try {
           sessionStorage.setItem('kk_toast', JSON.stringify({
             title: 'Success',
-            message: 'Registrasi berhasil. Silakan login.',
+            message: 'Registration successful. Please sign in.',
           }));
         } catch (_) {}
   
         // Redirect ke halaman login (sesuai response server)
-        window.location.href = data.redirect || "{% url 'main:login' %}";
+        redirectWithToast("Success", "Registration successful. Please sign in.", data.redirect || "{% url 'main:login' %}");
       } catch (ex) {
-        err.textContent = "Terjadi kesalahan jaringan.";
+        err.textContent = "Connection error.";
         err.classList.remove('hidden');
-        if (typeof showToast === 'function') showToast("Error", "Network error saat registrasi.");
+        if (typeof showToast === 'function') showToast("Error", "Network error when registering.");
       } finally {
         btn.disabled = false;
       }

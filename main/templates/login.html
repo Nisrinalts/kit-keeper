@@ -94,11 +94,11 @@
       }
 
       showToastSafe("Success", "Login berhasil ✨");
-      window.location.href = data.redirect || "{% url 'main:show_main' %}";
+      redirectWithToast("Success", "Signed in successfully.", data.redirect || "{% url 'main:show_main' %}");
     } catch (ex) {
-      err.textContent = "Terjadi kesalahan jaringan.";
+      err.textContent = "Connection error.";
       err.classList.remove('hidden');
-      showToastSafe("Error", "Network error saat login.");
+      showToastSafe("Error", "Network error when login.");
     } finally {
       btn.disabled = false;
     }

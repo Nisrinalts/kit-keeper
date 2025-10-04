@@ -1,8 +1,8 @@
+// static/js/toast.js
 (function () {
-  const toast = document.getElementById("toast-component");
+  const toast  = document.getElementById("toast-component");
   const titleEl = document.getElementById("toast-title");
-  const msgEl = document.getElementById("toast-message");
-
+  const msgEl   = document.getElementById("toast-message");
   if (!toast || !titleEl || !msgEl) return;
 
   function resetStyle() {
@@ -13,11 +13,9 @@
     );
   }
 
-
-  // type: "success" | "error" | (default) "normal"
-  window.showToast = function (title, message, type = "normal", duration = 8000) {
+  // tutorial-compatible: showToast(title, message, type?, duration?)
+  window.showToast = function (title, message, type = "normal", duration = 4000) {
     resetStyle();
-
     if (type === "success") {
       toast.classList.add("bg-green-50","border-green-500","text-green-700");
     } else if (type === "error") {
@@ -27,15 +25,14 @@
     }
 
     titleEl.textContent = title || "";
-    msgEl.textContent = message || "";
+    msgEl.textContent   = message || "";
 
-    // show (kanan-bawah)
-    toast.style.opacity = "1";
+    toast.style.opacity   = "1";
     toast.style.transform = "translateY(0)";
 
     clearTimeout(window.__kkToastTimer);
     window.__kkToastTimer = setTimeout(() => {
-      toast.style.opacity = "0";
+      toast.style.opacity   = "0";
       toast.style.transform = "translateY(4rem)";
     }, duration);
   };
