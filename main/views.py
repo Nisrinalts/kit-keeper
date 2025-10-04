@@ -53,7 +53,7 @@ def show_xml(request):
 
 
 def show_json(request):
-    product_list = Product.objects.all()
+    product_list = Product.objects.order_by('-created_at', 'name')
     data = [
         {
             "id": str(p.id),
@@ -76,6 +76,7 @@ def show_json(request):
         for p in product_list
     ]
     return JsonResponse(data, safe=False)
+
 
 
 def show_xml_by_id(request, id):

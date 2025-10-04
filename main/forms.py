@@ -5,6 +5,7 @@ from .models import Product
 
 class ProductForm(ModelForm):
     class Meta:
+        ordering = ['-created_at', 'name']
         model = Product
         fields = [
             "name", "price", "description", "thumbnail", "category", "is_featured",

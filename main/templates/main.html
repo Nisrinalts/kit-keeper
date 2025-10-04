@@ -256,12 +256,14 @@ async function doConfirmDelete(){
 }
 document.getElementById('confirmDeleteBtn').addEventListener('click', doConfirmDelete);
 
-/* ===== Card Builder ===== */
+/* ===== Card Builder (fixed overflow) ===== */
 function buildProductCardElement(product, index) {
   const name  = safe(product.name);
   const team  = product.team ? ` — ${safe(product.team)}` : '';
-  const img   = product.thumbnail ? `<img src="${safe(product.thumbnail)}" alt="${name}" class="w-full h-full object-cover block">`
-                                  : `<div class="w-full h-full flex items-center justify-center text-[#888]">No Image</div>`;
+  const img   = product.thumbnail
+    ? `<img src="${safe(product.thumbnail)}" alt="${name}" class="w-full h-full object-cover block">`
+    : `<div class="w-full h-full flex items-center justify-center text-[#888]">No Image</div>`;
+
   const isOwner = String(product.user_id||'') === String(CURRENT_USER_ID||'');
   const pill = "inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-[0.85rem] bg-white text-primary border border-primary transition-colors hover:bg-[#ECAD8F] hover:text-white hover:border-[#ECAD8F]";
   const ownerActions = isOwner ? `
@@ -283,25 +285,26 @@ function buildProductCardElement(product, index) {
         ${img}
       </div>
 
+      <!-- TEXT AREA -->
       <div class="border-[1.5px] border-black/20 rounded-xl p-2.5 sm:p-3 grid gap-2
-                  md:h-[34%] md:grid-rows-[auto_1px_auto_1fr_auto]">
+                  md:h-[34%] md:grid-rows-[auto_1px_auto_1fr_auto] min-w-0 overflow-hidden">
 
-        <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center justify-between gap-2 min-w-0">
           <span class="inline-block text-[0.68rem] tracking-[0.06em] uppercase bg-white border border-black/10 py-[0.16rem] px-2 rounded-full">
             Product ${index+1}
           </span>
           ${ownerActions}
         </div>
 
-        <div class="flex items-center justify-between gap-3">
-          <h3 class="m-0 text-[1rem] sm:text-[1.1rem] md:text-[1rem] leading-tight font-semibold truncate">
+        <div class="flex items-center justify-between gap-3 min-w-0">
+          <h3 class="m-0 text-[1rem] sm:text-[1.1rem] md:text-[1rem] leading-tight font-semibold break-words hyphens-auto">
             ${name}
           </h3>
         </div>
 
         <div class="w-full h-px bg-black/20"></div>
 
-        <div class="space-y-1">
+        <div class="space-y-1 min-w-0">
           <p class="m-0 text-[#222] text-[0.9rem]">Jersey${team}</p>
           <div class="mt-1 flex items-center justify-between">
             <p class="m-0 font-bold" style="color:#AF6E4E">
@@ -342,6 +345,13 @@ async function fetchProductsFromServer(){
     const res = await fetch(PRODUCTS_API_ENDPOINT, { headers:{'Accept':'application/json'} });
     if(!res.ok) throw new Error('Failed to fetch products');
     allProductsData = await res.json() || [];
+    allProductsData.sort((a, b) => {
+      const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+      if (tb !== ta) return tb - ta; // terbaru dulu
+      // tie-breaker biar stabil:
+      return String(a.name||'').localeCompare(String(b.name||''));
+    });
     filterAndDisplayProducts();
   }catch(err){
     console.error(err);
