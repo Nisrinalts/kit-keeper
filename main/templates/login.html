@@ -7,15 +7,11 @@
   <div class="w-full max-w-[480px] rounded-[20px] p-5 sm:p-6 md:p-8
               bg-kk-rose border border-black/10 shadow-[0_14px_32px_rgba(0,0,0,0.14)]">
     <div class="mb-3">
-      <h1 class="m-0 text-2xl sm:text-[1.35rem] tracking-[0.2px] font-bold text-textBaseWhite">
-        Welcome Back
-      </h1>
-      <p class="mt-0.5 mb-0 text-[0.92rem] text-textBaseWhite">
-        Sign in to continue
-      </p>
+      <h1 class="m-0 text-2xl sm:text-[1.35rem] tracking-[0.2px] font-bold text-textBaseWhite">Welcome Back</h1>
+      <p class="mt-0.5 mb-0 text-[0.92rem] text-textBaseWhite">Sign in to continue</p>
     </div>
 
-    <form method="POST" class="space-y-3" novalidate>
+    <form id="login-form" method="POST" class="space-y-3" novalidate>
       {% csrf_token %}
 
       {% if form.non_field_errors %}
@@ -25,26 +21,20 @@
       <!-- Username -->
       <div class="my-3">
         <label for="{{ form.username.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Username</label>
-        <input
-          type="text"
-          name="username"
-          id="{{ form.username.id_for_label }}"
-          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
-                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
-          autocomplete="username" autocapitalize="none" spellcheck="false">
+        <input type="text" name="username" id="{{ form.username.id_for_label }}"
+               class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                      outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
+               autocomplete="username" autocapitalize="none" spellcheck="false">
         {{ form.username.errors }}
       </div>
 
       <!-- Password -->
       <div class="my-3">
         <label for="{{ form.password.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="{{ form.password.id_for_label }}"
-          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
-                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
-          autocomplete="current-password">
+        <input type="password" name="password" id="{{ form.password.id_for_label }}"
+               class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                      outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
+               autocomplete="current-password">
         {{ form.password.errors }}
       </div>
 
@@ -57,13 +47,10 @@
                border border-[#111827] hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
         Sign In
       </button>
-    </form>
 
-    {% if messages %}
-      <ul class="mt-2.5 pl-4 text-success text-[0.92rem]">
-        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-      </ul>
-    {% endif %}
+      <!-- tempat error ringkas -->
+      <div id="login-error" class="hidden rounded-xl border border-red-300 bg-red-50 p-3 text-red-800 mt-3"></div>
+    </form>
 
     <p class="mt-3 text-[0.92rem] text-textBaseWhite">
       Don't have an account?
@@ -71,4 +58,88 @@
     </p>
   </div>
 </div>
+
+<!-- JS: intercept submit -> POST ke login_ajax -->
+<script>
+(function(){
+  const form = document.getElementById('login-form');
+  const btn  = form.querySelector('button[type="submit"]');
+  const err  = document.getElementById('login-error');
+
+  function showToastSafe(title, message){
+    if (window.showToast) { try { showToast(title, message); } catch(_) {} }
+  }
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    err.classList.add('hidden');
+    btn.disabled = true;
+
+    try {
+      const fd = new FormData(form); // sudah termasuk csrfmiddlewaretoken
+      const res = await fetch("{% url 'main:login_ajax' %}", {
+        method: "POST",
+        body: fd,
+        credentials: "same-origin",
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+      });
+      const data = await res.json().catch(()=> ({}));
+
+      if (!res.ok) {
+        const msg = data?.detail || "Login gagal.";
+        err.textContent = msg;
+        err.classList.remove('hidden');
+        showToastSafe("Error", msg);
+        return;
+      }
+
+      showToastSafe("Success", "Login berhasil ✨");
+      window.location.href = data.redirect || "{% url 'main:show_main' %}";
+    } catch (ex) {
+      err.textContent = "Terjadi kesalahan jaringan.";
+      err.classList.remove('hidden');
+      showToastSafe("Error", "Network error saat login.");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+
+<script>
+  (function(){
+    const form = document.querySelector('form');
+    const btn  = form?.querySelector('button[type="submit"]');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (btn) btn.disabled = true;
+
+      try {
+        const fd  = new FormData(form);  // sudah termasuk csrf token dari template
+        const res = await fetch("{% url 'main:login_ajax' %}", { method:'POST', body: fd });
+        const data = await res.json().catch(()=> ({}));
+
+        if (!res.ok) {
+          // tampilkan toast error langsung (tanpa redirect)
+          if (typeof showToast === 'function') showToast('Login Failed', data.detail || 'Invalid credentials');
+          return;
+        }
+
+        // simpan toast supaya tampil SESUDAH redirect (biar gak “kedip” hilang)
+        sessionStorage.setItem('kk_toast', JSON.stringify({
+          title: 'Welcome back!',
+          message: 'Login successful.'
+        }));
+
+        window.location.href = data.redirect || "{% url 'main:show_main' %}";
+      } catch (err) {
+        if (typeof showToast === 'function') showToast('Login Failed', 'Network error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  })();
+</script>
+
 {% endblock %}

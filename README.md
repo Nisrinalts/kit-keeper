@@ -190,3 +190,90 @@ Perbedaan utama:
     - Aku menggunakan breakpoint bawaan Tailwind (sm:, md:, lg:) untuk mengatur tampilan sesuai ukuran layar.
     - Semua halaman sudah aku uji di ukuran mobile, tablet, dan desktop supaya tetap nyaman dilihat.
 Dengan alur ini, semua checklist dari tugas 5 berhasil aku implementasikan: ada fitur edit & delete, tampilan halaman yang dikustomisasi, daftar produk dengan kondisi empty dan non-empty, card produk dengan tombol aksi, dan navbar responsif.
+
+
+TUGAS 6
+1. Apa perbedaan antara synchronous request dan asynchronous request?
+    Synchronous Request:
+    - Blocking: Browser menunggu respons dari server sebelum melanjutkan
+    - Halaman harus di-refresh untuk memperbarui konten
+    - User tidak bisa berinteraksi dengan halaman selama request diproses
+    - Contoh: Form submit tradisional yang me-reload halaman
+
+    Asynchronous Request:
+    - Non-blocking: Browser tetap bisa digunakan selama menunggu respons
+    - Update konten tanpa reload halaman (partial update)
+    - User bisa terus berinteraksi dengan halaman
+    - Contoh: Like post di social media tanpa refresh halaman
+
+2. Bagaimana AJAX bekerja di Django (alur request–response)?
+    1. Client-side:
+    - JavaScript membuat XMLHttpRequest/fetch ke URL Django
+    - Request bisa membawa data (POST/PUT) atau hanya mengambil data (GET)
+    - CSRF token disertakan untuk keamanan
+
+    2. Server-side (Django):
+    - View menerima request AJAX (dapat dideteksi dengan request.headers['X-Requested-With'])
+    - Memproses data/query database sesuai kebutuhan
+    - Mengembalikan response (biasanya JSON)
+    
+    3. Client-side lagi:
+    - JavaScript menerima response
+    - Memperbarui DOM sesuai data yang diterima
+    - Menampilkan feedback ke user (success/error)
+
+3. Apa keuntungan menggunakan AJAX dibandingkan render biasa di Django?
+    1. User Experience:
+    - Tidak ada page refresh yang mengganggu
+    - Feedback instant ke user
+    - Transisi lebih halus
+
+    2. Performa:
+    - Bandwidth lebih hemat (hanya transfer data yang diperlukan)
+    - Server load berkurang (tidak perlu render full page)
+    - Respons lebih cepat untuk update kecil
+
+    3. Interaktivitas:
+    - Real-time updates tanpa refresh
+    - Multi-tasking (user bisa lakukan beberapa aksi sekaligus)
+    - Validasi form instant
+
+4. Bagaimana cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django?
+    1. CSRF Protection:
+    - Sertakan CSRF token di setiap request
+    - Gunakan {% csrf_token %} di template
+    - Kirim token via headers: 'X-CSRFToken'
+
+    2. Validasi:
+    - Server-side validation tetap wajib
+    - Sanitasi input untuk mencegah XSS
+    - Rate limiting untuk mencegah brute force
+
+    3. Best Practices:
+    - Gunakan HTTPS
+    - Jangan simpan data sensitif di localStorage/sessionStorage
+    - Implementasi timeout untuk session
+    - Enkripsi data sensitif sebelum dikirim
+
+5. Bagaimana AJAX mempengaruhi pengalaman pengguna (User Experience) pada website?
+    1. Kecepatan & Responsivitas:
+    - Update UI instan tanpa loading screen
+    - Feedback langsung untuk aksi user
+    - Mengurangi waktu tunggu
+
+    2. Interaktivitas:
+    - Form validation real-time
+    - Auto-save
+    - Live search/filter
+    - Infinite scroll
+
+    3. Seamless Experience:
+    - Tidak ada interupsi navigasi
+    - Background processing
+    - Progress indicators untuk operasi panjang
+    - Reduced cognitive load karena konteks tetap terjaga
+
+    4. Mobile-Friendly:
+    - Hemat bandwidth
+    - Lebih responsif di koneksi lambat
+    - Lebih baik untuk single page applications

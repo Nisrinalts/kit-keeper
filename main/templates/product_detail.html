@@ -19,27 +19,55 @@
         ← Back
       </a>
 
+      <!-- AJAX states (hidden, tidak mengubah layout) -->
+      <div id="pd-loading" class="hidden mb-3 text-sm text-[#374151]">
+        Loading product detail…
+      </div>
+      <div id="pd-error" class="hidden mb-3 text-sm text-red-600">
+        Gagal memuat detail. Coba muat ulang halaman.
+      </div>
+
       <div class="grid gap-6 md:gap-8 md:grid-cols-[1fr_auto]">
         <!-- LEFT: Detail -->
         <div>
-          <h1 class="text-2xl md:text-[28px] md:leading-[34px] font-extrabold text-[#111827] mb-3 md:mb-4">
+          <h1 id="pd-title" class="text-2xl md:text-[28px] md:leading-[34px] font-extrabold text-[#111827] mb-3 md:mb-4">
             {{ product.name }}
           </h1>
 
           <!-- grid label: value (lebih rapi di mobile) -->
           <div class="grid grid-cols-[110px_1fr] gap-x-3 gap-y-2 text-[#111827] text-sm sm:text-base">
             <span class="font-bold">Price:</span>
-            <span>Rp <span class="kk-idr" data-idr="{{ product.price|default:0 }}">{{ product.price }}</span></span>
-            <span class="font-bold">Category:</span>      <span>{{ product.get_category_display|default:product.category }}</span>
-            <span class="font-bold">Description:</span>   <span>{{ product.description }}</span>
-            <span class="font-bold">Size:</span>          <span>{{ product.get_size_display|default:"-" }}</span>
-            <span class="font-bold">Sleeve:</span>        <span>{{ product.get_sleeve_type_display|default:"-" }}</span>
-            <span class="font-bold">Team:</span>          <span>{{ product.team|default:"-" }}</span>
-            <span class="font-bold">Season:</span>        <span>{{ product.season|default:"-" }}</span>
-            <span class="font-bold">Condition:</span>     <span>{{ product.condition|default:"-" }}</span>
-            <span class="font-bold">Manufacturer:</span>  <span>{{ product.manufacturer|default:"-" }}</span>
-            <span class="font-bold">Stock:</span>         <span>{{ product.stock|default:"0" }}</span>
-            <span class="font-bold">Owner:</span>         <span>{{ product.user|default:"None" }}</span>
+            <span>Rp <span id="pd-price" class="kk-idr" data-idr="{{ product.price|default:0 }}">{{ product.price }}</span></span>
+
+            <span class="font-bold">Category:</span>
+            <span id="pd-category">{{ product.get_category_display|default:product.category }}</span>
+
+            <span class="font-bold">Description:</span>
+            <span id="pd-desc">{{ product.description }}</span>
+
+            <span class="font-bold">Size:</span>
+            <span id="pd-size">{{ product.get_size_display|default:"-" }}</span>
+
+            <span class="font-bold">Sleeve:</span>
+            <span id="pd-sleeve">{{ product.get_sleeve_type_display|default:"-" }}</span>
+
+            <span class="font-bold">Team:</span>
+            <span id="pd-team">{{ product.team|default:"-" }}</span>
+
+            <span class="font-bold">Season:</span>
+            <span id="pd-season">{{ product.season|default:"-" }}</span>
+
+            <span class="font-bold">Condition:</span>
+            <span id="pd-condition">{{ product.condition|default:"-" }}</span>
+
+            <span class="font-bold">Manufacturer:</span>
+            <span id="pd-manufacturer">{{ product.manufacturer|default:"-" }}</span>
+
+            <span class="font-bold">Stock:</span>
+            <span id="pd-stock">{{ product.stock|default:"0" }}</span>
+
+            <span class="font-bold">Owner:</span>
+            <span id="pd-owner">{{ product.user|default:"None" }}</span>
           </div>
         </div>
 
@@ -48,9 +76,10 @@
           <div class="w-full max-w-[340px] rounded-[16px] bg-white border border-black/10 shadow-[0_10px_26px_rgba(0,0,0,0.12)] p-4">
             <div class="w-full rounded-[12px] overflow-hidden bg-[#e5e7eb] aspect-square">
               {% if product.thumbnail %}
-                <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-full object-cover block">
+                <img id="pd-thumb" src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-full object-cover block">
               {% else %}
-                <div class="w-full h-full flex items-center justify-center text-[#888]">
+                <img id="pd-thumb" src="" alt="No image" class="w-full h-full object-cover hidden">
+                <div id="pd-thumb-fallback" class="w-full h-full flex items-center justify-center text-[#888]">
                   <em>No image</em>
                 </div>
               {% endif %}
@@ -81,9 +110,108 @@
           </button>
         </form>
       </div>      
-    {% endif %}
+      {% endif %}
 
     </div>
   </div>
 </div>
+
+<script>
+  // ===== Config =====
+  const PRODUCT_ID = "{{ product.id }}";
+  const PRODUCT_DETAIL_ENDPOINT = `{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}`
+    .replace('00000000-0000-0000-0000-000000000000', PRODUCT_ID);
+  
+  // ===== DOM Refs =====
+  const elLoading = document.getElementById('pd-loading');
+  const elError   = document.getElementById('pd-error');
+  
+  const elTitle   = document.getElementById('pd-title');
+  const elPrice   = document.getElementById('pd-price');
+  const elCategory= document.getElementById('pd-category');
+  const elDesc    = document.getElementById('pd-desc');           // <- match ID
+  const elSize    = document.getElementById('pd-size');
+  const elSleeve  = document.getElementById('pd-sleeve');
+  const elTeam    = document.getElementById('pd-team');
+  const elSeason  = document.getElementById('pd-season');
+  const elCondition = document.getElementById('pd-condition');
+  const elManufacturer = document.getElementById('pd-manufacturer');
+  const elStock   = document.getElementById('pd-stock');
+  const elOwner   = document.getElementById('pd-owner');
+  const elThumb   = document.getElementById('pd-thumb');          // <- match ID
+  const elThumbFallback = document.getElementById('pd-thumb-fallback'); // mungkin null (kalau awalnya ada gambar)
+  
+  // ===== Helpers =====
+  function setLoading(on){ if (elLoading) elLoading.classList.toggle('hidden', !on); }
+  function setError(on){ if (elError) elError.classList.toggle('hidden', !on); }
+  const CATEGORY_LABELS = { jersey: "Jersey" };
+  const SIZE_LABELS = { xxs:"XXS", xs:"XS", s:"S", m:"M", l:"L", xl:"XL", xxl:"XXL" };
+  const SLEEVE_LABELS = { none:"None", short:"Short Sleeve", long:"Long Sleeve" };
+  
+  function formatIDR(n){
+    const v = Number(n||0);
+    return new Intl.NumberFormat('id-ID').format(v);
+  }
+  
+  // ===== Render =====
+  function renderProduct(p){
+    // Title & <title>
+    if (elTitle) elTitle.textContent = p.name || '';
+    document.title = `${p.name||'Product'} — KitKeeper`;
+  
+    // Price
+    if (elPrice){
+      elPrice.setAttribute('data-idr', p.price||0);
+      elPrice.textContent = formatIDR(p.price||0);
+    }
+  
+    // Category, Size, Sleeve
+    if (elCategory) elCategory.textContent = CATEGORY_LABELS[p.category] || (p.category || '-');
+    if (elSize)     elSize.textContent     = SIZE_LABELS[p.size] || (p.size || '-');
+    if (elSleeve)   elSleeve.textContent   = SLEEVE_LABELS[p.sleeve_type] || (p.sleeve_type || '-');
+  
+    // Others
+    if (elDesc)        elDesc.textContent        = p.description || '-';
+    if (elTeam)        elTeam.textContent        = p.team || '-';
+    if (elSeason)      elSeason.textContent      = p.season || '-';
+    if (elCondition)   elCondition.textContent   = p.condition || '-';
+    if (elManufacturer)elManufacturer.textContent= p.manufacturer || '-';
+    if (elStock)       elStock.textContent       = (p.stock ?? 0);
+    if (elOwner)       elOwner.textContent       = p.user_username || 'None';
+  
+    // Image
+    if (elThumb){
+      if (p.thumbnail){
+        elThumb.src = p.thumbnail;
+        elThumb.alt = p.name || 'Product';
+        elThumb.classList.remove('hidden');
+        if (elThumbFallback) elThumbFallback.classList.add('hidden');
+      } else {
+        // tanpa thumbnail
+        elThumb.removeAttribute('src');
+        elThumb.alt = 'No image';
+        elThumb.classList.add('hidden');
+        if (elThumbFallback) elThumbFallback.classList.remove('hidden');
+      }
+    }
+  }
+  
+  // ===== Fetch & init =====
+  async function loadProductDetail(){
+    try{
+      setError(false); setLoading(true);
+      const res = await fetch(PRODUCT_DETAIL_ENDPOINT, { headers: { 'Accept':'application/json' }});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      renderProduct(data);
+    }catch(err){
+      console.error('Load product detail failed:', err);
+      setError(true);
+    }finally{
+      setLoading(false);
+    }
+  }
+  
+  document.addEventListener('DOMContentLoaded', loadProductDetail);
+</script>
 {% endblock %}

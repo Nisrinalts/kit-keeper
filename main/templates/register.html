@@ -11,7 +11,7 @@
       <p class="mt-0.5 mb-0 text-textGray text-[0.92rem]">It takes less than a minute</p>
     </div>
 
-    <form method="POST">
+    <form id="register-form" method="POST" novalidate>
       {% csrf_token %}
 
       {% if form.non_field_errors %}
@@ -21,14 +21,11 @@
       <!-- Username -->
       <div class="my-3">
         <label for="{{ form.username.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Username</label>
-        <input
-          type="text"
-          name="username"
-          id="{{ form.username.id_for_label }}"
-          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
-                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
-          autocapitalize="none" spellcheck="false">
-        {{ form.username.errors }}
+        <input type="text" name="username" id="{{ form.username.id_for_label }}"
+               class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                      outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
+               autocapitalize="none" spellcheck="false">
+        <div class="kk-field-error text-[0.85rem] text-red-700 mt-1 hidden" data-for="username"></div>
         {% if form.username.help_text %}
           <div class="mt-1.5 text-[#6b7280] text-[0.85rem] leading-snug">{{ form.username.help_text|safe }}</div>
         {% endif %}
@@ -37,13 +34,10 @@
       <!-- Password -->
       <div class="my-3">
         <label for="{{ form.password1.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Password</label>
-        <input
-          type="password"
-          name="password1"
-          id="{{ form.password1.id_for_label }}"
-          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
-                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent">
-        {{ form.password1.errors }}
+        <input type="password" name="password1" id="{{ form.password1.id_for_label }}"
+               class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                      outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent">
+        <div class="kk-field-error text-[0.85rem] text-red-700 mt-1 hidden" data-for="password1"></div>
         {% if form.password1.help_text %}
           <div class="mt-1.5 text-[#6b7280] text-[0.85rem] leading-snug">{{ form.password1.help_text|safe }}</div>
         {% endif %}
@@ -52,13 +46,10 @@
       <!-- Confirm Password -->
       <div class="my-3">
         <label for="{{ form.password2.id_for_label }}" class="block text-[0.85rem] text-textDark mb-1.5">Confirm Password</label>
-        <input
-          type="password"
-          name="password2"
-          id="{{ form.password2.id_for_label }}"
-          class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
-                 outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent">
-        {{ form.password2.errors }}
+        <input type="password" name="password2" id="{{ form.password2.id_for_label }}"
+               class="block w-full rounded-xl border border-black/20 bg-white py-3 px-3.5 text-[0.96rem]
+                      outline-none focus:ring-2 focus:ring-[#6366F1] focus:border-transparent">
+        <div class="kk-field-error text-[0.85rem] text-red-700 mt-1 hidden" data-for="password2"></div>
       </div>
 
       <button type="submit"
@@ -66,13 +57,9 @@
                border border-[#111827] hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
         Sign Up
       </button>
-    </form>
 
-    {% if messages %}
-      <ul class="mt-2.5 pl-4 text-success text-[0.92rem]">
-        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-      </ul>
-    {% endif %}
+      <div id="register-error" class="hidden rounded-xl border border-red-300 bg-red-50 p-3 text-red-800 mt-3"></div>
+    </form>
 
     <p class="mt-3 text-[0.92rem] text-textGray">
       Already have an account?
@@ -80,4 +67,76 @@
     </p>
   </div>
 </div>
+
+<script>
+  (function(){
+    const form = document.getElementById('register-form');
+    const btn  = form.querySelector('button[type="submit"]');
+    const err  = document.getElementById('register-error');
+  
+    function setFieldError(name, msgs){
+      const box = form.querySelector(`.kk-field-error[data-for="${name}"]`);
+      if (!box) return;
+      if (msgs && msgs.length) {
+        box.innerHTML = msgs.join("<br>");
+        box.classList.remove('hidden');
+      } else {
+        box.textContent = "";
+        box.classList.add('hidden');
+      }
+    }
+    function clearFieldErrors(){
+      form.querySelectorAll('.kk-field-error').forEach(b=>{ b.textContent=""; b.classList.add('hidden'); });
+    }
+  
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      btn.disabled = true;
+      err.classList.add('hidden');
+      clearFieldErrors();
+  
+      try {
+        const fd = new FormData(form);
+        const res = await fetch("{% url 'main:register_ajax' %}", {
+          method: "POST",
+          body: fd,
+          credentials: "same-origin",
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        });
+        const data = await res.json().catch(()=> ({}));
+  
+        if (!res.ok) {
+          if (data?.errors) {
+            for (const [name, msgs] of Object.entries(data.errors)) setFieldError(name, msgs);
+            err.textContent = "Periksa kembali input kamu.";
+          } else {
+            err.textContent = data?.detail || "Registrasi gagal.";
+          }
+          err.classList.remove('hidden');
+          // opsional: toast error saat gagal
+          if (typeof showToast === 'function') showToast("Error", "Registrasi gagal.");
+          return;
+        }
+  
+        // === Sukses: simpan toast ke sessionStorage (dibaca di base.html) ===
+        try {
+          sessionStorage.setItem('kk_toast', JSON.stringify({
+            title: 'Success',
+            message: 'Registrasi berhasil. Silakan login.',
+          }));
+        } catch (_) {}
+  
+        // Redirect ke halaman login (sesuai response server)
+        window.location.href = data.redirect || "{% url 'main:login' %}";
+      } catch (ex) {
+        err.textContent = "Terjadi kesalahan jaringan.";
+        err.classList.remove('hidden');
+        if (typeof showToast === 'function') showToast("Error", "Network error saat registrasi.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  })();
+  </script>
+  
 {% endblock %}

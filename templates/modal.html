@@ -1,0 +1,284 @@
+<!-- templates/modal.html -->
+<!-- Overlay -->
+<div id="crudModal"
+     class="hidden fixed inset-0 z-[999] w-full flex items-center justify-center
+            bg-black/40 backdrop-blur-[1px]">
+
+  <!-- Container -->
+  <div id="crudModalContent"
+       class="opacity-0 scale-95 transition-all duration-200
+              bg-white rounded-[18px] shadow-[0_16px_40px_rgba(0,0,0,.18)]
+              w-[92%] sm:w-[70%] md:w-[56%] lg:w-[46%] xl:w-[38%]
+              max-h-[88vh] overflow-y-auto border border-black/10">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-3 p-5 sm:p-6 border-b border-black/10
+                bg-[radial-gradient(circle,_#EED9DC,_#D2A3A9,_#C28F95)]">
+      <div>
+        <h3 id="modalTitle" class="text-xl font-extrabold text-white">
+          Create New Product
+        </h3>
+        <p class="text-sm text-[#374151] mt-1">Add an item to your KitKeeper collection</p>
+      </div>
+      <button type="button"
+              class="text-[#111827]/60 hover:text-white hover:bg-[#ffb6c1] transition
+                     rounded-lg p-2"
+              onclick="hideModal()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Body (rose) -->
+    <div class="px-5 sm:px-6 py-5 space-y-4 bg-[#EED9DC]">
+      <form id="productForm" data-mode="create" data-product-id="">
+        {% csrf_token %}
+
+        <!-- name -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-[#111827]">Name</label>
+          <input id="name" name="name" type="text" required
+                 class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2
+                        bg-white focus:outline-none focus:ring-2 focus:ring-[#AF6E4E]"/>
+        </div>
+
+        <!-- price -->
+        <div>
+          <label for="price" class="block text-sm font-medium text-[#111827]">Price</label>
+          <input id="price" name="price" type="number" min="0" step="1" required
+                 class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2
+                        bg-white focus:outline-none focus:ring-2 focus:ring-[#AF6E4E]"/>
+        </div>
+
+        <!-- description -->
+        <div>
+          <label for="description" class="block text-sm font-medium text-[#111827]">Description</label>
+          <textarea id="description" name="description" rows="3" required
+                    class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2
+                           bg-white focus:outline-none focus:ring-2 focus:ring-[#AF6E4E]"></textarea>
+        </div>
+
+        <!-- thumbnail -->
+        <div>
+          <label for="thumbnail" class="block text-sm font-medium text-[#111827]">Thumbnail URL</label>
+          <input id="thumbnail" name="thumbnail" type="url" placeholder="https://…"
+                 class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2
+                        bg-white focus:outline-none focus:ring-2 focus:ring-[#AF6E4E]"/>
+        </div>
+
+        <!-- category + is_featured -->
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="category" class="block text-sm font-medium text-[#111827]">Category</label>
+            <select id="category" name="category" required
+                    class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2
+                           bg-white focus:outline-none focus:ring-2 focus:ring-[#AF6E4E]">
+              <option value="jersey">Jersey</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <label class="inline-flex items-center gap-2">
+              <input id="is_featured" name="is_featured" type="checkbox"
+                     class="w-4 h-4 rounded border-black/20 bg-white">
+              <span class="text-sm text-[#111827]">Featured</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- optionals -->
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="team" class="block text-sm font-medium text-[#111827]">Team</label>
+            <input id="team" name="team" type="text"
+                   class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2 bg-white"/>
+          </div>
+          <div>
+            <label for="season" class="block text-sm font-medium text-[#111827]">Season</label>
+            <input id="season" name="season" type="text" placeholder="e.g. 2022/23"
+                   class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2 bg-white"/>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label for="size" class="block text-sm font-medium text-[#111827]">Size</label>
+            <select id="size" name="size"
+                    class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2 bg-white">
+              <option value="">-</option>
+              <option value="xxs">XXS</option><option value="xs">XS</option>
+              <option value="s">S</option><option value="m">M</option>
+              <option value="l">L</option><option value="xl">XL</option>
+              <option value="xxl">XXL</option>
+            </select>
+          </div>
+          <div>
+            <label for="sleeve_type" class="block text-sm font-medium text-[#111827]">Sleeve</label>
+            <select id="sleeve_type" name="sleeve_type"
+                    class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2 bg-white">
+              <option value="">-</option>
+              <option value="none">None</option>
+              <option value="short">Short Sleeve</option>
+              <option value="long">Long Sleeve</option>
+            </select>
+          </div>
+          <div>
+            <label for="condition" class="block text-sm font-medium text-[#111827]">Condition</label>
+            <input id="condition" name="condition" type="text"
+                   class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2 bg-white"/>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="manufacturer" class="block text-sm font-medium text-[#111827]">Manufacturer</label>
+            <input id="manufacturer" name="manufacturer" type="text"
+                   class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2 bg-white"/>
+          </div>
+          <div>
+            <label for="stock" class="block text-sm font-medium text-[#111827]">Stock</label>
+            <input id="stock" name="stock" type="number" min="0" step="1" value="0"
+                   class="mt-1 w-full rounded-[12px] border border-black/15 px-3 py-2 bg-white"/>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer (gradient + cancel putih, hover soft red) -->
+    <div class="flex flex-col sm:flex-row gap-3 p-5 sm:p-6 border-t border-black/10
+                bg-[radial-gradient(circle,_#EED9DC,_#D2A3A9,_#C28F95)] rounded-b-[18px]">
+      <button type="button"
+              class="order-2 sm:order-1 px-5 py-2.5 rounded-[12px] border border-black/15
+                     bg-white text-[#111827] hover:bg-[#FCA5A5] hover:text-white transition"
+              onclick="hideModal()">
+        Cancel
+      </button>
+      <button type="submit" form="productForm" id="submitBtn"
+              class="order-1 sm:order-2 flex-1 px-5 py-2.5 rounded-[12px]
+                     bg-white text-primary border border-primary
+                     hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition">
+        <span id="submitBtnLabel">Create Product (AJAX)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+  function showModal() {
+    const modal = document.getElementById('crudModal');
+    const modalContent = document.getElementById('crudModalContent');
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modalContent.classList.remove('opacity-0','scale-95');
+      modalContent.classList.add('opacity-100','scale-100');
+    });
+  }
+  function hideModal() {
+    const modal = document.getElementById('crudModal');
+    const modalContent = document.getElementById('crudModalContent');
+    modalContent.classList.remove('opacity-100','scale-100');
+    modalContent.classList.add('opacity-0','scale-95');
+    setTimeout(() => modal.classList.add('hidden'), 150);
+  }
+
+  // ===== Dual-mode helpers =====
+  const formEl        = document.getElementById('productForm');
+  const modalTitleEl  = document.getElementById('modalTitle');
+  const submitLblEl   = document.getElementById('submitBtnLabel');
+
+  function setModalMode(mode) {
+    formEl.dataset.mode = mode; // 'create' | 'update'
+    if (mode === 'create') {
+      modalTitleEl.textContent = 'Create New Product';
+      submitLblEl.textContent  = 'Create Product (AJAX)';
+    } else {
+      modalTitleEl.textContent = 'Update Product';
+      submitLblEl.textContent  = 'Save Changes';
+    }
+  }
+
+  function resetFormFields() {
+    formEl.reset();
+    const featured = document.getElementById('is_featured');
+    if (featured) featured.checked = false;
+  }
+
+  async function prefillForm(productId) {
+    const url = "{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}"
+                  .replace('00000000-0000-0000-0000-000000000000', productId);
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' }});
+    if (!res.ok) throw new Error('Failed to load product');
+    const p = await res.json();
+
+    document.getElementById('name').value         = p.name ?? '';
+    document.getElementById('price').value        = p.price ?? 0;
+    document.getElementById('description').value  = p.description ?? '';
+    document.getElementById('thumbnail').value    = p.thumbnail ?? '';
+    document.getElementById('category').value     = p.category ?? 'jersey';
+    document.getElementById('is_featured').checked= !!p.is_featured;
+    document.getElementById('team').value         = p.team ?? '';
+    document.getElementById('season').value       = p.season ?? '';
+    document.getElementById('size').value         = p.size ?? '';
+    document.getElementById('sleeve_type').value  = p.sleeve_type ?? '';
+    document.getElementById('condition').value    = p.condition ?? '';
+    document.getElementById('manufacturer').value = p.manufacturer ?? '';
+    document.getElementById('stock').value        = p.stock ?? 0;
+  }
+
+  // Public API dipanggil dari tombol luar
+  window.openCreateModal = function () {
+    formEl.dataset.productId = '';
+    resetFormFields();
+    setModalMode('create');
+    showModal();
+  };
+
+  window.openUpdateModal = async function (productId) {
+    formEl.dataset.productId = productId;
+    setModalMode('update');
+    await prefillForm(productId);
+    showModal();
+  };
+
+  // Submit handler (create/update)
+  async function submitHandler(e) {
+    e.preventDefault();
+    const mode = formEl.dataset.mode || 'create';
+
+    let endpoint = "{% url 'main:add_product_entry_ajax' %}";
+    if (mode === 'update') {
+      const pid = formEl.dataset.productId;
+      endpoint = "{% url 'main:update_product_entry_ajax' '00000000-0000-0000-0000-000000000000' %}"
+                   .replace('00000000-0000-0000-0000-000000000000', pid);
+    }
+
+    const res  = await fetch(endpoint, { method: "POST", body: new FormData(formEl) });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      if (typeof showToast === 'function') {
+        // versi minimal ala tutorial (title, message)
+        try { showToast('Failed', data.detail || 'Action failed'); }
+        catch { alert(data.detail || 'Action failed'); }
+      } else {
+        alert(data.detail || 'Action failed');
+      }
+      return;
+    }
+
+    if (mode === 'create') {
+      if (typeof showToast === 'function') {
+        try { showToast('Success', 'Product created'); } catch {}
+      }
+      document.dispatchEvent(new CustomEvent('productAdded'));
+      formEl.reset();
+    } else {
+      if (typeof showToast === 'function') {
+        try { showToast('Success', 'Product updated'); } catch {}
+      }
+      document.dispatchEvent(new CustomEvent('productUpdated', { detail: data }));
+    }
+
+    hideModal();
+  }
+
+  // pastikan hanya sekali terpasang
+  formEl.addEventListener('submit', submitHandler);
+</script>

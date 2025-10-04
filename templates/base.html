@@ -5,27 +5,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+  <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          /* === Palette baru === */
           colors: {
             primary:'#0f172a', error:'#b00020', success:'#065f46',
             textGray:'#4b5563', textDark:'#263238', linkText:'#111827',
-            textBaseWhite:'#ffffff', 
-            /* swatches  */
-            'kk-rose':'#D2A3A9',
-            'kk-lilac':'#E6DCE5',
-            'kk-blush':'#EBC3C1',
-            'kk-peach':'#ECAD8F',
-            'kk-terra':'#AF6E4E',
+            textBaseWhite:'#ffffff',
+            'kk-rose':'#D2A3A9', 'kk-lilac':'#E6DCE5', 'kk-blush':'#EBC3C1',
+            'kk-peach':'#ECAD8F', 'kk-terra':'#AF6E4E',
           },
-          /* Gradient */
           backgroundImage: {
-            'kk-pink' : 'radial-gradient(circle, #F2D7D4, #EBC3C1, #E3ADA7)',  
-            'kk-rose' : 'radial-gradient(circle, #EED9DC, #D2A3A9, #C28F95)',  
+            'kk-pink' : 'radial-gradient(circle, #F2D7D4, #EBC3C1, #E3ADA7)',
+            'kk-rose' : 'radial-gradient(circle, #EED9DC, #D2A3A9, #C28F95)',
             'kk-amber': 'radial-gradient(circle, #F4D2C3, #E6B198, #F9E4D7)',
             'kk-peach' : 'radial-gradient(circle, #F6D3C3, #ECAD8F, #E39B79)',
           },
@@ -34,30 +30,40 @@
     }
   </script>
 
-  <!-- global styles (bg-welcome, dll) -->
   <link rel="stylesheet" href="{% static 'css/global.css' %}">
 
   {% block meta %}{% endblock meta %}
   <title>{% block title %}KitKeeper{% endblock title %}</title>
 </head>
-    
-<script>
+
+<body class="min-h-screen p-8">
+  {% if request.user.is_authenticated %}
+    {% include 'navbar.html' %}
+  {% endif %}
+
+  {% block content %}{% endblock content %}
+
+  {% include 'toast.html' %}
+  
+
+  {% include 'modal.html' %}
+
+  <script>
+    // Formatter harga untuk elemen .kk-idr
     (function () {
       if (window.__kkFormatPrice) return;
       window.__kkFormatPrice = true;
-  
+
       function formatPrices() {
         var fmt = new Intl.NumberFormat('id-ID');
         document.querySelectorAll('.kk-idr').forEach(function (el) {
           var raw = el.getAttribute('data-idr');
           if (raw == null) return;
-          var val = Number(raw); // pakai Number biar 1500000 atau 1500000.0 aman
-          if (!Number.isNaN(val)) {
-            el.textContent = fmt.format(val); // 1.500.000
-          }
+          var val = Number(raw);
+          if (!Number.isNaN(val)) el.textContent = fmt.format(val);
         });
       }
-  
+
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', formatPrices);
       } else {
@@ -65,12 +71,35 @@
       }
     })();
   </script>
-  
-<!-- HAPUS bg-gradient-radial supaya tidak menimpa gradient per-halaman -->
-<body class="min-h-screen p-8">
-  {% if request.user.is_authenticated %}
-    {% include 'navbar.html' %}
+
+  {# === TOAST BRIDGE: tampilkan toast yang dikirim lewat sessionStorage setelah redirect === #}
+  <script>
+    (function () {
+      try {
+        const raw = sessionStorage.getItem('kk_toast');
+        if (raw) {
+          const t = JSON.parse(raw);
+          if (typeof showToast === 'function') {
+            showToast(t.title || 'Info', t.message || '');
+          }
+          sessionStorage.removeItem('kk_toast');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  {% if messages %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const titleMap = {success:'Success', error:'Error', warning:'Warning', info:'Info'};
+      {% for message in messages %}
+        try {
+          const title = titleMap['{{ message.tags|default:"info" }}'] || 'Info';
+          showToast(title, "{{ message|escapejs }}");
+        } catch(e) {}
+      {% endfor %}
+    });
+  </script>
   {% endif %}
-  {% block content %}{% endblock content %}
 </body>
 </html>
