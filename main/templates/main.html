@@ -256,7 +256,7 @@ async function doConfirmDelete(){
 }
 document.getElementById('confirmDeleteBtn').addEventListener('click', doConfirmDelete);
 
-/* ===== Card Builder (fixed overflow) ===== */
+/* ===== Card Builder — refined balanced spacing ===== */
 function buildProductCardElement(product, index) {
   const name  = safe(product.name);
   const team  = product.team ? ` — ${safe(product.team)}` : '';
@@ -264,7 +264,7 @@ function buildProductCardElement(product, index) {
     ? `<img src="${safe(product.thumbnail)}" alt="${name}" class="w-full h-full object-cover block">`
     : `<div class="w-full h-full flex items-center justify-center text-[#888]">No Image</div>`;
 
-  const isOwner = String(product.user_id||'') === String(CURRENT_USER_ID||'');
+  const isOwner = String(product.user_id || '') === String(CURRENT_USER_ID || '');
   const pill = "inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-[0.85rem] bg-white text-primary border border-primary transition-colors hover:bg-[#ECAD8F] hover:text-white hover:border-[#ECAD8F]";
   const ownerActions = isOwner ? `
     <div class="flex items-center gap-2 shrink-0">
@@ -279,36 +279,38 @@ function buildProductCardElement(product, index) {
               w-full md:w-[300px] md:h-[500px] md:flex md:flex-col md:gap-2
               transition-all duration-300 hover:shadow-[0_12px_24px_rgba(0,0,0,.18)] hover:-translate-y-1">
 
+    <!-- MEDIA + CONTENT -->
     <div class="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-[160px_1fr] items-stretch md:grid-cols-1 md:contents">
+      <!-- IMAGE -->
       <div class="border-[1.5px] border-black/20 rounded-xl overflow-hidden bg-[#f6f6f6]
                   aspect-[4/3] sm:aspect-auto sm:h-[130px] md:h-[66%] md:aspect-auto">
         ${img}
       </div>
 
-      <!-- TEXT AREA -->
-      <div class="border-[1.5px] border-black/20 rounded-xl p-2.5 sm:p-3 grid gap-2
-                  md:h-[34%] md:grid-rows-[auto_1px_auto_1fr_auto] min-w-0 overflow-hidden">
+      <!-- TEXT AREA (dirombak: flex-col; footer diletakkan dalam wrapper mt-auto biar mepet bawah) -->
+      <div class="border-[1.5px] border-black/20 rounded-xl p-2.5 sm:p-3 flex flex-col
+                  md:h-[34%] min-w-0 overflow-hidden">
 
+        <!-- top row: pill + owner actions -->
         <div class="flex items-center justify-between gap-2 min-w-0">
           <span class="inline-block text-[0.68rem] tracking-[0.06em] uppercase bg-white border border-black/10 py-[0.16rem] px-2 rounded-full">
-            Product ${index+1}
+            Product ${index + 1}
           </span>
           ${ownerActions}
         </div>
 
-        <div class="flex items-center justify-between gap-3 min-w-0">
-          <h3 class="m-0 text-[1rem] sm:text-[1.1rem] md:text-[1rem] leading-tight font-semibold break-words hyphens-auto">
-            ${name}
-          </h3>
-        </div>
+        <!-- product name (adaptive) -->
+        <h3 class="kk-name m-0 mt-1 font-semibold leading-tight break-words hyphens-auto
+                   text-[1.1rem] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+          ${name}
+        </h3>
 
-        <div class="w-full h-px bg-black/20"></div>
-
-        <div class="space-y-1 min-w-0">
+        <!-- bottom group: category-team + price+button, dibikin nempel & mepet bawah -->
+        <div class="mt-auto min-w-0">
           <p class="m-0 text-[#222] text-[0.9rem]">Jersey${team}</p>
           <div class="mt-1 flex items-center justify-between">
             <p class="m-0 font-bold" style="color:#AF6E4E">
-              Rp <span class="kk-idr" data-idr="${product.price||0}">${product.price||0}</span>
+              Rp <span class="kk-idr" data-idr="${product.price || 0}">${product.price || 0}</span>
             </p>
             <a href="${makeDetailUrl(product.id)}" class="${pill}">Detail</a>
           </div>
@@ -318,8 +320,71 @@ function buildProductCardElement(product, index) {
     </div>
   </div>
 </div>`;
-  return el.firstElementChild;
+
+  const card = el.firstElementChild;
+  // pasang auto-fit untuk nama produk (kecil dulu, kalau masih overflow baru jadi 2 baris)
+  const nameEl = card.querySelector('.kk-name');
+  setupNameFitting(nameEl);
+
+  return card;
 }
+
+function setupNameFitting(el) {
+  if (!el) return;
+
+  const BASE_REM = 1.10;   // ukuran awal
+  const MIN_REM  = 0.92;   // batas minimum sebelum paksa 2 baris
+  const STEP     = 0.04;
+
+  function applyOneLine(sizeRem) {
+    el.style.fontSize = sizeRem + 'rem';
+    el.style.whiteSpace = 'nowrap';
+    el.style.overflow = 'hidden';
+    el.style.textOverflow = 'ellipsis';
+    // bersihkan kemungkinan clamp 2 baris sebelumnya
+    el.style.removeProperty('-webkit-line-clamp');
+    el.style.removeProperty('-webkit-box-orient');
+    el.style.removeProperty('display');
+  }
+
+  function applyTwoLines() {
+    // izinkan 2 baris dengan clamp
+    el.style.whiteSpace = 'normal';
+    el.style.overflow = 'hidden';
+    el.style.textOverflow = 'ellipsis';
+    el.style.setProperty('display', '-webkit-box');
+    el.style.setProperty('-webkit-box-orient', 'vertical');
+    el.style.setProperty('-webkit-line-clamp', '2');
+  }
+
+  function fit() {
+    // jika belum ter-mount, tunda
+    if (!el.isConnected || el.clientWidth === 0) {
+      requestAnimationFrame(fit);
+      return;
+    }
+
+    let size = BASE_REM;
+    applyOneLine(size);
+
+    // kecilkan font selama masih overflow dan belum lewat batas minimum
+    let guard = 0;
+    while (el.scrollWidth > el.clientWidth && size - STEP >= MIN_REM && guard++ < 20) {
+      size -= STEP;
+      applyOneLine(size);
+    }
+
+    // jika masih overflow → jadikan 2 baris
+    if (el.scrollWidth > el.clientWidth) {
+      applyTwoLines();
+    }
+  }
+
+  // jalankan setelah layout siap + saat resize
+  requestAnimationFrame(fit);
+  window.addEventListener('resize', fit, { passive: true });
+}
+
 
 /* ===== Render / Filter / Fetch ===== */
 function renderAllProductCards(items){
