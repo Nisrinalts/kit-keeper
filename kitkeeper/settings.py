@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -147,6 +148,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # -> menunjuk folder yang ber
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static' ] 
+
+# folder output collectstatic (yang dilayani di production)
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # Default primary key field type

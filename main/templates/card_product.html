@@ -23,36 +23,13 @@
       {# RIGHT — text + price + action #}
       <div class="border-[1.5px] border-black/20 rounded-xl p-2.5 sm:p-3 grid gap-2
                   md:h-[34%] md:grid-rows-[auto_1px_auto_1fr_auto]">
-
-        {# badge di atas seperti semula #}
-        <span class="inline-block text-[0.68rem] tracking-[0.06em] uppercase bg-white border border-black/10 py-[0.16rem] px-2 rounded-full">
-          Product {{ counter }}
-        </span>
-
-        {# NAMA + (Edit/Delete jika pemilik) — tetap di dalam box #}
-        <div class="flex items-center justify-between gap-2">
-          <h3 class="m-0 text-[1rem] sm:text-[1.1rem] md:text-[1rem] leading-tight font-semibold truncate">
+        <div class="flex flex-col items-start gap-1">
+          <span class="inline-block text-[0.68rem] tracking-[0.06em] uppercase bg-white border border-black/10 py-[0.16rem] px-2 rounded-full">
+            Product {{ counter }}
+          </span>
+          <h3 class="m-0 text-[1rem] sm:text-[1.1rem] md:text-[1rem] leading-tight font-semibold">
             {{ product.name }}
           </h3>
-
-          {% if request.user.is_authenticated and product.user_id == request.user.id %}
-          <div class="flex items-center gap-2 shrink-0">
-            <button type="button"
-                    onclick="openUpdateModal('{{ product.id }}')"
-                    class="inline-flex items-center justify-center px-3 py-1.5 text-[0.85rem]
-                           bg-white text-primary border border-primary rounded-xl
-                           hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
-              Edit
-            </button>
-            <button type="button"
-                    onclick="showConfirmDelete('{{ product.id }}')"
-                    class="inline-flex items-center justify-center px-3 py-1.5 text-[0.85rem]
-                           bg-white text-primary border border-primary rounded-xl
-                           hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
-              Delete
-            </button>
-          </div>
-          {% endif %}
         </div>
 
         <div class="w-full h-px bg-black/20"></div>
@@ -62,21 +39,20 @@
             {% if product.category %}{{ product.get_category_display|default:product.category }}{% endif %}
             {% if product.team %} — {{ product.team }}{% endif %}
           </p>
-
+      
           <div class="mt-1 flex items-center justify-between">
             <p class="m-0 font-bold" style="color:#AF6E4E">
               Rp <span class="kk-idr" data-idr="{{ product.price|default:0 }}">{{ product.price }}</span>
             </p>
 
             <a href="{% url 'main:show_product' product.id %}"
-               class="ml-3 shrink-0 inline-flex items-center justify-center px-3 py-1.5 text-[0.85rem]
+              class="ml-3 shrink-0 inline-flex items-center justify-center px-3 py-1.5 text-[0.85rem]
                       bg-white text-primary border border-primary rounded-xl
                       hover:bg-[#ffb6c1] hover:text-white hover:border-[#ffb6c1] transition-colors">
               Detail
             </a>
           </div>
         </div>
-
       </div>
     </div>
   </div>
