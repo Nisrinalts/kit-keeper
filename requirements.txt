@@ -1,9 +1,8 @@
-Django==4.2.7
+django
 gunicorn
 whitenoise
 psycopg2-binary
 requests
-django-cors-headers
 urllib3
 python-dotenv
-
+django-cors-headers
