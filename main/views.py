@@ -447,7 +447,7 @@ def create_product_flutter(request):
 
     team = strip_tags(data.get("team", "")) if data.get("team") else ""
     season = strip_tags(data.get("season", "")) if data.get("season") else ""
-    size = data.get("size")  # bisa None
+    size = data.get("size")  
     sleeve_type = data.get("sleeve_type")
     condition = strip_tags(data.get("condition", "")) if data.get("condition") else ""
     manufacturer = strip_tags(data.get("manufacturer", "")) if data.get("manufacturer") else ""
@@ -474,7 +474,6 @@ def create_product_flutter(request):
         condition=condition,
         manufacturer=manufacturer,
         user=request.user,
-        # stock bisa default (0) -> dari model
     )
 
     return JsonResponse({"status": "success", "id": str(product.id)}, status=200)
