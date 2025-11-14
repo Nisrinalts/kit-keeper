@@ -17,6 +17,10 @@ import datetime
 from main.models import Product
 from main.forms import ProductForm
 
+import json
+import requests  # untuk proxy_image
+
+
 
 @login_required(login_url='/login')
 def show_main(request):
@@ -392,3 +396,116 @@ def logout_ajax(request):
     )
     response.delete_cookie("last_login")
     return response
+
+
+from django.http import HttpResponse
+
+def proxy_image(request):
+    """
+    Proxy simple untuk load image dari URL eksternal ke Flutter
+    supaya gak kena CORS problem.
+    """
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+
+    try:
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+
+
+@csrf_exempt
+def create_product_flutter(request):
+    """
+    Terima JSON dari Flutter, buat Product baru milik user yg login (CookieRequest).
+    """
+    if request.method != 'POST':
+        return JsonResponse(
+        {"status": "error", "message": "Invalid method"},
+        status=405,  # Method Not Allowed
+    )
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": "error", "message": "Unauthorized"}, status=401)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+
+    name = strip_tags(data.get("name", "").strip())
+    description = strip_tags(data.get("description", "")) if data.get("description") else ""
+    thumbnail = data.get("thumbnail", "")
+    category = data.get("category", "jersey")
+    is_featured = data.get("is_featured", False)
+
+    team = strip_tags(data.get("team", "")) if data.get("team") else ""
+    season = strip_tags(data.get("season", "")) if data.get("season") else ""
+    size = data.get("size")  # bisa None
+    sleeve_type = data.get("sleeve_type")
+    condition = strip_tags(data.get("condition", "")) if data.get("condition") else ""
+    manufacturer = strip_tags(data.get("manufacturer", "")) if data.get("manufacturer") else ""
+
+    try:
+        price = int(data.get("price") or 0)
+    except ValueError:
+        return JsonResponse({"status": "error", "message": "Price must be a number"}, status=400)
+
+    if not name:
+        return JsonResponse({"status": "error", "message": "Name is required"}, status=400)
+
+    product = Product.objects.create(
+        name=name,
+        price=price,
+        description=description,
+        thumbnail=thumbnail,
+        category=category,
+        is_featured=is_featured,
+        team=team,
+        season=season,
+        size=size if size else None,
+        sleeve_type=sleeve_type if sleeve_type else None,
+        condition=condition,
+        manufacturer=manufacturer,
+        user=request.user,
+        # stock bisa default (0) -> dari model
+    )
+
+    return JsonResponse({"status": "success", "id": str(product.id)}, status=200)
+
+from django.http import JsonResponse
+
+def show_json_my_products(request):
+    if not request.user.is_authenticated:
+        # Bisa balikin list kosong + status 401
+        return JsonResponse([], safe=False, status=401)
+
+    product_list = Product.objects.filter(user=request.user).order_by('-created_at', 'name')
+    data = [
+        {
+            "id": str(p.id),
+            "name": p.name,
+            "price": p.price,
+            "description": p.description,
+            "thumbnail": p.thumbnail,
+            "category": p.category,
+            "is_featured": p.is_featured,
+            "team": p.team,
+            "season": p.season,
+            "size": p.size,
+            "sleeve_type": p.sleeve_type,
+            "condition": p.condition,
+            "manufacturer": p.manufacturer,
+            "stock": p.stock,
+            "created_at": p.created_at.isoformat() if p.created_at else None,
+            "user_id": p.user_id,
+        }
+        for p in product_list
+    ]
+    return JsonResponse(data, safe=False)
